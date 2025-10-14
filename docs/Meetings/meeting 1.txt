@@ -1,0 +1,20 @@
+Plan for Mondays meeting
+Explain what I have been doing (reviewing other tools, research papers)
+Questions to ask (How would you suggest I go about testing through user testing (collection), Accuracy challenges, handling various guitar techniques, Any research paper I need to review)
+Should this be a website or a software
+working with Pre trained model: basic pitch 
+Modern AMT uses deep neural networks (CNNs + Transformers)
+discuss how frequent we should meet
+showcase my project proposal draft
+
+
+[Notes from meeting]
+software is a better approach, don't require to handle hosting and such complication
+Test with just guitar audio
+papers to review
+benchmark few of those models 
+Meeting: 
+Once a week (for now)
+twice a month (later on)
+
+
