@@ -3,6 +3,7 @@ librosa==0.11.0
 soundfile==0.12.1
 numpy==1.24.3
 scipy==1.11.4
+noisereduce==3.0.3
 
 # AI transcription
 basic-pitch==0.3.0
