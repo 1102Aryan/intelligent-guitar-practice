@@ -1,0 +1,32 @@
+### Plan for Mondays meeting
+
+Pathfinding algorithm, neural network ML, 
+
+note filters - (smooth time)
+
+need to work on: 
+
+Create logic of the application on app.diagram.net
+
+interim report
+
+
+
+
+
+#### 
+
+#### Resources used:
+
+adding End to End polyphonic DDSP models - using DDSP and Basic Pitch. PolyDDSP
+
+DDSP plays the note back - verification feature (allow users to compare the perfectly clean recording and compare if transcription was accurate)
+
+
+
+
+
+
+
+### \[Notes from meeting]
+

@@ -36,8 +36,15 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-#User plan
+# User plan
 docs/Project Plan.docx
+
+
+# Songs 
+examples/
+
+# Testing data
+resources/
 
 # Unit test / coverage reports
 htmlcov/

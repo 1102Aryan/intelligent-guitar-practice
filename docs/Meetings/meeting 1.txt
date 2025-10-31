@@ -13,6 +13,7 @@ software is a better approach, don't require to handle hosting and such complica
 Test with just guitar audio
 papers to review
 benchmark few of those models 
+Complete Ethics form and Data Management Plan for user testing
 Meeting: 
 Once a week (for now)
 twice a month (later on)

@@ -1,5 +1,37 @@
 Plan for Mondays meeting
 Discuss about Data Management Plan
 Ethics form
+Any research I need to review
+Started working with Basic Pitch
+midi file is piano 
+Does not work with guitar currently
+Working on just guitar tracks
+Does not consider different guitar techniques
+showcase what I have done so far 
+
+
+YouTubers followed through:
+- Jeff Heaton
+- Valerio Velardo
+- Xavier Serra - Course digital signal processing courserra
+- Julius O smith
+
+Resources used:
+https://mixbutton.com/music-tools/frequency-and-pitch/music-note-to-frequency-chart
+https://www.nti-audio.com/en/support/know-how/fast-fourier-transform-fft
+https://arxiv.org/html/2509.22655
 
 [Notes from meeting]
+raw 
+peaks and valleys 
+Smooth the notes (grouping)
+evaluation with users 
+start with tones
+reaper - octave range 
+next isolated guitar tracks 
+filtering - extracting the tones 
+pitch tracking libraries 
+DDSP - google project 
+notations ornamentations that works perfectly or having user editing tabs
+puredata - plugdata - signal processing 
+handling tracks that has fxs
