@@ -1,12 +1,40 @@
 import librosa
+# Maps note to fretboard
+# f = 440 . 2^(n-69)/12
+# https://inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
+# Midi
 
 STANDARD_TUNING = {
-    6: 40, #E
-    5: 45, #A
-    4: 50, #D
-    3: 55, #G
-    2: 59, #B
-    1: 64  #E
+    6: 40, #E2
+    5: 45, #A2
+    4: 50, #D3
+    3: 55, #G3
+    2: 59, #B3
+    1: 64  #E4
+}
+
+DROPD_TUNING = {
+    6: 38, #D2
+    5: 45, #A2
+    4: 50, #D3
+    3: 55, #G3
+    2: 59, #B3
+    1: 64, #E4
+}
+
+OPENC_TUNING = {
+    6: 36, #C2
+    5: 43, #G2
+    4: 48, #C3
+    3: 55, #G3
+    2: 60, #C4
+    1: 64, #E4 
+}
+
+TUNINGS = {
+    0: STANDARD_TUNING,
+    1: DROPD_TUNING,
+    2: OPENC_TUNING,
 }
 
 def note_to_frequency_mapping(note_list):
@@ -15,6 +43,14 @@ def note_to_frequency_mapping(note_list):
     for note in note_list:
         frequency_list.append(librosa.midi_to_hz(note))
     return frequency_list
+
+def capo_position(capo_no, tuning = STANDARD_TUNING):
+    new_tuning = {}
+    for string_no, midi_pitch in tuning.items():
+        new_pitch = midi_pitch + capo_no
+        new_tuning[string_no] = new_pitch
+    return new_tuning
+            
 
 def map_note_to_fret(note_midi, max_fret = 24, tuning = STANDARD_TUNING):
     # fret = midi_note - open_string
@@ -31,12 +67,21 @@ def best_position(prev_pos, curr_pos):
     prev_string, prev_fret = prev_pos
     return min(curr_pos, key=lambda x: abs(x[0]-prev_string) + abs(x[1]-prev_fret))
 
-def all_midi_notes(note_events):
+def all_midi_notes(note_events, tuning_type):
+    """
+    Maps all the notes to the fretboard.
+    Perimeter:
+        note_event
+        tuning_no: Used to select which tuning user picked
+    returns 
+        note events with fretboard mapping  
+    """
+    # tuning_type = TUNINGS.get(tuning_no, STANDARD_TUNING)
     positions = []
     prev_pos = None
     for note in note_events:
         onset, offset, pitch_midi, velocity, confidence = note
-        candidates = map_note_to_fret(pitch_midi)
+        candidates = map_note_to_fret(pitch_midi, tuning=tuning_type)
         if not candidates:
             continue
         best = best_position(prev_pos, candidates)

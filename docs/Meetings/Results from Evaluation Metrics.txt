@@ -1,0 +1,356 @@
+Basic Pitch No preprocessing or post processing  
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 71
+Total number of predicted notes: 95
+•••••
+True Positives: 50
+False Positives: 45
+False Negatives: 21
+•••••
+The precision of the model: 0.5263
+The recall of the model: 0.7042
+The F1-Score of the model: 0.6024
+=======================================================================
+
+Processing: 00_BN1-147-Gb_comp.jams
+Predicting MIDI for C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend/resources/audio_mono-mic\00_BN1-147-Gb_comp_mic.wav...
+First predicted note onset: 0.034829931972789115
+First actual note onset: 0.007574603174475669
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 151
+Total number of predicted notes: 146
+•••••
+True Positives: 96
+False Positives: 50
+False Negatives: 55
+•••••
+The precision of the model: 0.6575
+The recall of the model: 0.6358
+The F1-Score of the model: 0.6465
+=======================================================================
+
+Processing: 00_BN1-147-Gb_solo.jams
+Predicting MIDI for C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend/resources/audio_mono-mic\00_BN1-147-Gb_solo_mic.wav...
+First predicted note onset: 0.011609977324263039
+First actual note onset: 0.008685714285661561
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 89
+Total number of predicted notes: 125
+•••••
+True Positives: 75
+False Positives: 50
+False Negatives: 14
+•••••
+The precision of the model: 0.6000
+The recall of the model: 0.8427
+The F1-Score of the model: 0.7009
+=======================================================================
+
+Processing: 00_BN2-131-B_comp.jams
+Predicting MIDI for C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend/resources/audio_mono-mic\00_BN2-131-B_comp_mic.wav...
+First predicted note onset: 0.09287981859410431
+First actual note onset: 0.10612789115646137
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 239
+Total number of predicted notes: 192
+•••••
+True Positives: 136
+False Positives: 56
+False Negatives: 103
+•••••
+The precision of the model: 0.7083
+The recall of the model: 0.5690
+The F1-Score of the model: 0.6311
+=======================================================================
+
+Basic Pitch with Preprocessing 
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 133
+Total number of predicted notes: 103
+•••••
+True Positives: 45
+False Positives: 58
+False Negatives: 88
+•••••
+The precision of the model: 0.4369
+The recall of the model: 0.3383
+The F1-Score of the model: 0.3814
+=======================================================================
+
+Processing: 00_BN1-129-Eb_solo.jams
+y: [-2.2351742e-08 -7.4505806e-09  0.0000000e+00  2.2351742e-08
+  0.0000000e+00  1.1175871e-08  7.4505806e-09  0.0000000e+00
+ -1.1175871e-08  9.3132257e-09]
+shape y: (492253,)
+Predicting MIDI for processed.wav...
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 71
+Total number of predicted notes: 81
+•••••
+True Positives: 38
+False Positives: 43
+False Negatives: 33
+•••••
+The precision of the model: 0.4691
+The recall of the model: 0.5352
+The F1-Score of the model: 0.5000
+=======================================================================
+
+Processing: 00_BN1-147-Gb_comp.jams
+y: [0.00135836 0.00222444 0.00212144 0.00204989 0.00232665 0.00205246
+ 0.00186211 0.00197166 0.00187788 0.00196666]
+shape y: (431863,)
+Predicting MIDI for processed.wav...
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 151
+Total number of predicted notes: 109
+•••••
+True Positives: 64
+False Positives: 45
+False Negatives: 87
+•••••
+The precision of the model: 0.5872
+The recall of the model: 0.4238
+The F1-Score of the model: 0.4923
+=======================================================================
+
+Processing: 00_BN1-147-Gb_solo.jams
+y: [ 1.4901161e-08  3.7252903e-08  7.4505806e-09  0.0000000e+00
+ -1.4901161e-08  2.9802322e-08 -1.4901161e-08  0.0000000e+00
+ -2.9802322e-08 -1.4901161e-08]
+shape y: (431863,)
+Predicting MIDI for processed.wav...
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 89
+Total number of predicted notes: 49
+•••••
+True Positives: 29
+False Positives: 20
+False Negatives: 60
+•••••
+The precision of the model: 0.5918
+The recall of the model: 0.3258
+The F1-Score of the model: 0.4203
+=======================================================================
+
+Processing: 00_BN2-131-B_comp.jams
+y: [-0.00116843 -0.00149253 -0.00121108 -0.00151165 -0.00137029 -0.00149819
+ -0.0012431  -0.00142083 -0.00128123 -0.00129598]
+shape y: (646206,)
+Predicting MIDI for processed.wav...
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 239
+Total number of predicted notes: 148
+•••••
+True Positives: 89
+False Positives: 59
+False Negatives: 150
+•••••
+The precision of the model: 0.6014
+The recall of the model: 0.3724
+The F1-Score of the model: 0.4599
+=======================================================================
+
+Basic Pitch with Preprocessing and postprocessing 
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 133
+Total number of predicted notes: 70
+•••••
+True Positives: 36
+False Positives: 34
+False Negatives: 97
+•••••
+The precision of the model: 0.5143
+The recall of the model: 0.2707
+The F1-Score of the model: 0.3547
+=======================================================================
+
+Processing: 00_BN1-129-Eb_solo.jams
+y: [-2.2351742e-08 -7.4505806e-09  0.0000000e+00  2.2351742e-08
+  0.0000000e+00  1.1175871e-08  7.4505806e-09  0.0000000e+00
+ -1.1175871e-08  9.3132257e-09]
+shape y: (492253,)
+Predicting MIDI for processed.wav...
+Number of notes after filtering by confience: 56 notes
+Number of notes after filtering by short notes: 56 notes
+Number of notes after filtering by removing duplicate notes: 56 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 71
+Total number of predicted notes: 56
+•••••
+True Positives: 33
+False Positives: 23
+False Negatives: 38
+•••••
+The precision of the model: 0.5893
+The recall of the model: 0.4648
+The F1-Score of the model: 0.5197
+=======================================================================
+
+Processing: 00_BN1-147-Gb_comp.jams
+y: [0.00135836 0.00222444 0.00212144 0.00204989 0.00232665 0.00205246
+ 0.00186211 0.00197166 0.00187788 0.00196666]
+shape y: (431863,)
+Predicting MIDI for processed.wav...
+Number of notes after filtering by confience: 79 notes
+Number of notes after filtering by short notes: 79 notes
+Number of notes after filtering by removing duplicate notes: 79 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 151
+Total number of predicted notes: 79
+•••••
+True Positives: 58
+False Positives: 21
+False Negatives: 93
+•••••
+The precision of the model: 0.7342
+The recall of the model: 0.3841
+The F1-Score of the model: 0.5043
+=======================================================================
+
+Processing: 00_BN1-147-Gb_solo.jams
+y: [ 1.4901161e-08  3.7252903e-08  7.4505806e-09  0.0000000e+00
+ -1.4901161e-08  2.9802322e-08 -1.4901161e-08  0.0000000e+00
+ -2.9802322e-08 -1.4901161e-08]
+shape y: (431863,)
+Predicting MIDI for processed.wav...
+Number of notes after filtering by confience: 33 notes
+Number of notes after filtering by short notes: 33 notes
+Number of notes after filtering by removing duplicate notes: 33 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 89
+Total number of predicted notes: 33
+•••••
+True Positives: 23
+False Positives: 10
+False Negatives: 66
+•••••
+The precision of the model: 0.6970
+The recall of the model: 0.2584
+The F1-Score of the model: 0.3770
+=======================================================================
+
+Processing: 00_BN2-131-B_comp.jams
+y: [-0.00116843 -0.00149253 -0.00121108 -0.00151165 -0.00137029 -0.00149819
+ -0.0012431  -0.00142083 -0.00128123 -0.00129598]
+shape y: (646206,)
+Predicting MIDI for processed.wav...
+Number of notes after filtering by confience: 101 notes
+Number of notes after filtering by short notes: 101 notes
+Number of notes after filtering by removing duplicate notes: 101 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 239
+Total number of predicted notes: 101
+•••••
+True Positives: 77
+False Positives: 24
+False Negatives: 162
+•••••
+The precision of the model: 0.7624
+The recall of the model: 0.3222
+The F1-Score of the model: 0.4529
+=======================================================================
+
+Basic Pitch with Postprocessing 
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 133
+Total number of predicted notes: 118
+•••••
+True Positives: 70
+False Positives: 48
+False Negatives: 63
+•••••
+The precision of the model: 0.5932
+The recall of the model: 0.5263
+The F1-Score of the model: 0.5578
+=======================================================================
+
+Processing: 00_BN1-129-Eb_solo.jams
+Predicting MIDI for C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend/resources/audio_mono-mic\00_BN1-129-Eb_solo_mic.wav...
+Number of notes after filtering by confience: 84 notes
+Number of notes after filtering by short notes: 84 notes
+Number of notes after filtering by removing duplicate notes: 84 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 71
+Total number of predicted notes: 84
+•••••
+True Positives: 50
+False Positives: 34
+False Negatives: 21
+•••••
+The precision of the model: 0.5952
+The recall of the model: 0.7042
+The F1-Score of the model: 0.6452
+=======================================================================
+
+Processing: 00_BN1-147-Gb_comp.jams
+Predicting MIDI for C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend/resources/audio_mono-mic\00_BN1-147-Gb_comp_mic.wav...
+Number of notes after filtering by confience: 111 notes
+Number of notes after filtering by short notes: 111 notes
+Number of notes after filtering by removing duplicate notes: 111 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 151
+Total number of predicted notes: 111
+•••••
+True Positives: 84
+False Positives: 27
+False Negatives: 67
+•••••
+The precision of the model: 0.7568
+The recall of the model: 0.5563
+The F1-Score of the model: 0.6412
+=======================================================================
+
+Processing: 00_BN1-147-Gb_solo.jams
+Predicting MIDI for C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend/resources/audio_mono-mic\00_BN1-147-Gb_solo_mic.wav...
+Number of notes after filtering by confience: 89 notes
+Number of notes after filtering by short notes: 89 notes
+Number of notes after filtering by removing duplicate notes: 89 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 89
+Total number of predicted notes: 89
+•••••
+True Positives: 75
+False Positives: 14
+False Negatives: 14
+•••••
+The precision of the model: 0.8427
+The recall of the model: 0.8427
+The F1-Score of the model: 0.8427
+=======================================================================
+
+Processing: 00_BN2-131-B_comp.jams
+Predicting MIDI for C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend/resources/audio_mono-mic\00_BN2-131-B_comp_mic.wav...
+Number of notes after filtering by confience: 144 notes
+Number of notes after filtering by short notes: 144 notes
+Number of notes after filtering by removing duplicate notes: 144 notes
+Processing Evaluation...
+=======================================================================
+Total number of actual notes: 239
+Total number of predicted notes: 144
+•••••
+True Positives: 114
+False Positives: 30
+False Negatives: 125
+•••••
+The precision of the model: 0.7917
+The recall of the model: 0.4770
+The F1-Score of the model: 0.5953

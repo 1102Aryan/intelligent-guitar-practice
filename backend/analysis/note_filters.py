@@ -142,7 +142,6 @@ def filter_process(note_events, scale_notes=None):
     """
     Creates a process pipeline which runs all the filtering processes
     
-    
     Returns:
         A cleaned, filtered note_events
     """
@@ -156,7 +155,6 @@ def filter_process(note_events, scale_notes=None):
     
     # : Sort the notes and pitch
     notes = sorted_note_time_pitch(notes)
-    print("hello")
     
     # 3: Removing duplicate notes
     notes = duplicate_note_filter(notes, 0.05)
