@@ -39,9 +39,9 @@ pip-delete-this-directory.txt
 # User plan
 docs/Project Plan.docx
 
-
 # Songs 
 examples/
+*.wav
 
 # Testing data
 resources/
