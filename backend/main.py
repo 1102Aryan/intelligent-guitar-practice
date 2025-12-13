@@ -8,6 +8,7 @@ from tablature.fretboard_mapper import *
 from tablature.tab_generator import *
 from analysis.note_filters import *
 from analysis.audio_seperation import *
+from models.fretboard_mapper import FretBoardMapper
 
 def automatic_music_transcription(file_path, tuning, min_confidence=0.5, min_duration=0.05, output_dir="outputs"):
     """
@@ -27,7 +28,7 @@ def automatic_music_transcription(file_path, tuning, min_confidence=0.5, min_dur
         audio_signal, sample_rate = audio_loader(audio_path)
         
         # Pre-processing
-        audio_signal, sample_rate = pre_process(audio_signal, sample_rate)
+        # audio_signal, sample_rate = pre_process(audio_signal, sample_rate)
         
         # Converts back into wav file for Basic Pitch
         sf.write("processed.wav", audio_signal, sample_rate)
@@ -41,11 +42,24 @@ def automatic_music_transcription(file_path, tuning, min_confidence=0.5, min_dur
         # Processes the note events
         filtered_notes = filter_process(note_events)
         
-        # fretboard mapping
-        mapped_notes = all_midi_notes(filtered_notes, tuning)
+        # Code for running FretBoardCNN
+        # list of midi
+        mapper = FretBoardMapper()
+        midi_list = [note[2] for note in filtered_notes]
+        mapped = mapper.map_notes(midi_list)
+
+        # Create flat list of (note_event, position) tuples
+        mapped_notes = []
+        for note_event, position in zip(filtered_notes, mapped):
+            mapped_notes.append((note_event, position)) 
+
+        print(f"Created {len(mapped_notes)} mapped notes")
         
-        if not mapped_notes:
-            return "could not map notes to fretboard"
+        # fretboard mapping
+        # mapped_notes = all_midi_notes(filtered_notes, tuning)
+        
+        # if not mapped_notes:
+        #     return "could not map notes to fretboard"
         # sorted_notes = sorted_notes(mapped_notes)
         grouped_notes = group_notes(mapped_notes)
                 
@@ -84,8 +98,6 @@ def main():
         file_path = args.file_path
     result = automatic_music_transcription(file_path, current_tuning)
     print(result)
-
-
  
     
 if __name__ == '__main__':

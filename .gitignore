@@ -42,9 +42,11 @@ docs/Project Plan.docx
 # Songs 
 examples/
 *.wav
+*.flac
 
 # Testing data
 resources/
+*.jams
 
 # Unit test / coverage reports
 htmlcov/

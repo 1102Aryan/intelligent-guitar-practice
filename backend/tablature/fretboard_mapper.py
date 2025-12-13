@@ -38,13 +38,27 @@ TUNINGS = {
 }
 
 def note_to_frequency_mapping(note_list):
-    # Using librosa to convert to Hz
+    """
+    Using librosa to convert to Hz
+    Parameters:
+        note_list
+    Return:
+        returns a list of the frequency from the midi
+    """
     frequency_list = []
     for note in note_list:
         frequency_list.append(librosa.midi_to_hz(note))
     return frequency_list
 
 def capo_position(capo_no, tuning = STANDARD_TUNING):
+    """
+    Updates the tuning based on the position of the capo. 1 capo = 1 semitone up
+    Parameter:
+        capo_no: the position the capo is set to
+        tuning: the current pitches of the open strings in the guitar
+    Return:
+        returns a new tuning based on the capo position
+    """
     new_tuning = {}
     for string_no, midi_pitch in tuning.items():
         new_pitch = midi_pitch + capo_no

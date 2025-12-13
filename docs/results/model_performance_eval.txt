@@ -1,0 +1,91 @@
+Fretboard CNN
+                        ~~~~Final Result For FretBoard Mapping~~~~
+=======================================================================
+Total number of actual notes: 62476
+Total number of predicted notes: 62659
+•••••
+Fretboard Exact Match Accuracy: 61.7399%
+  (Of the notes properly detected, 61.7399% were placed on correct String/Fret)
+•••••
+Average String Distance Error:  0.42
+Average Fret Distance Error:    1.96
+=======================================================================
+with post processing 
+
+   [DEBUG] JAMS Time: 0.03401360544216914 | PRED Time: 0.023219954648526078
+                        ~~~~Final Result For FretBoard Mapping~~~~
+=======================================================================
+Total number of actual notes: 62476
+Total number of predicted notes: 52860
+•••••
+Fretboard Exact Match Accuracy: 59.3615%
+  (Of the notes properly detected, 59.3615% were placed on correct String/Fret)
+•••••
+Average String Distance Error:  0.44
+Average Fret Distance Error:    2.08
+=======================================================================
+
+Heuristic
+
+with post processing 
+   [DEBUG] JAMS Time: 0.03401360544216914 | PRED Time: 0.023219954648526078
+                        ~~~~Final Result For FretBoard Mapping~~~~
+=======================================================================
+Total number of actual notes: 62476
+Total number of predicted notes: 52860
+•••••
+Fretboard Exact Match Accuracy: 41.2657%
+  (Of the notes properly detected, 41.2657% were placed on correct String/Fret)
+•••••
+Average String Distance Error:  0.97
+Average Fret Distance Error:    4.65
+=======================================================================
+
+without post processing 
+                        ~~~~Final Result For FretBoard Mapping~~~~
+=======================================================================
+Total number of actual notes: 62476
+Total number of predicted notes: 62600
+•••••
+Fretboard Exact Match Accuracy: 41.8425%
+  (Of the notes properly detected, 41.8425% were placed on correct String/Fret)
+•••••
+Average String Distance Error:  0.94
+Average Fret Distance Error:    4.50
+=======================================================================
+
+TabCNN
+
+=======================================================
+           TABCNN FRETBOARD ACCURACY
+=======================================================
+Total Notes in Test Set:        8715
+Notes Correctly Detected:       2898
+-------------------------------------------------------
+Exact Fretboard Match Accuracy: 14.04%
+Average String Error:           0.98
+Average Fret Error:             4.87
+=======================================================
+
+                       ~~~~Final Result For FretBoard Mapping~~~~
+=======================================================================
+Total number of actual notes: 8715
+Total number of predicted notes: 9524
+•••••
+Fretboard Exact Match Accuracy: 49.5567%
+  (Of the notes properly detected, 49.5567% were placed on correct String/Fret)
+•••••
+Average String Distance Error:  0.81
+Average Fret Distance Error:    3.88
+=======================================================================
+                        ~~~~Final Result For FretBoard Mapping~~~~
+=======================================================================
+Total number of actual notes: 8715
+Total number of predicted notes: 9527
+•••••
+Fretboard Exact Match Accuracy: 60.3282%
+  (Of the notes properly detected, 60.3282% were placed on correct String/Fret)
+•••••
+Average String Distance Error:  0.43
+Average Fret Distance Error:    2.01
+=======================================================================

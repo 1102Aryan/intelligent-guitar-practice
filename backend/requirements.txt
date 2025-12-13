@@ -7,7 +7,7 @@ noisereduce==3.0.3
 
 # AI transcription
 basic-pitch==0.3.0
-tensorflow==2.15.0
+tensorflow==3.0.3
 
 # Music notation
 music21==9.1.0

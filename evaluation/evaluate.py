@@ -1,6 +1,7 @@
 import jams
 import soundfile as sf
 import os
+import mir_eval as mir
 from os import listdir
 from os.path import isfile, join
 from backend.core.audio_loader import audio_loader
@@ -40,6 +41,8 @@ def load_guitarset(file_path):
             # notes.append({'onset': note.time, 'offset': note.time +  note.duration, 'pitch': note.value})
     notes.sort(key=lambda x: x['onset'])
     return notes
+    
+
 
 def check_notes_match(actual_note, predicted_note, time_threshold=0.1, pitch_threshold=0.5):
     """
@@ -62,6 +65,22 @@ def check_notes_match(actual_note, predicted_note, time_threshold=0.1, pitch_thr
         print(f"Checks: onset={onset_check}, pitch={pitch_check}, offset={offset_check}")
         print()
     return onset_check and pitch_check and offset_check
+
+def evaluate_mir(actual_notes, predicted_notes):
+    ref_intervals = np.array([[note['onset'], note['offset']] for note in actual_notes])
+    ref_pitches = np.array([note['midi_value'] for note in actual_notes])
+    est_intervals = np.array([[note[0], note[1]] for note in predicted_notes])
+    est_pitches = np.array([note[2] for note in predicted_notes])
+    
+    scores = mir.transcription.evaluate(ref_intervals, ref_pitches, est_intervals, est_pitches, 
+                                        onset_tolerance=0.1,
+                                        pitch_tolerance=0.5,
+                                        offset_ratio=0.2)
+    print(f"Precision: {scores['Precision']:.4f}")
+    print(f"Recall: {scores['Recall']:.4f}")
+    print(f"F1: {scores['F-measure']:.4f}")
+    
+    return scores
     
 def metrics_result(actual_notes, predicted_notes):
     """
@@ -70,6 +89,9 @@ def metrics_result(actual_notes, predicted_notes):
         actual_notes: notes results provided by GuitarSet
         predicted_notes: contains the notes calculated by the model
     """
+    global all_true_positives, all_false_negatives, all_false_positives
+    global total_actual_notes, total_predicted_notes
+    
     matched_stored = set()
     true_positive = 0
     
@@ -85,7 +107,6 @@ def metrics_result(actual_notes, predicted_notes):
                 matched_stored.add(index)
                 match = True
                 break
-    
 
     precision = 0
     recall = 0
@@ -106,8 +127,8 @@ def metrics_result(actual_notes, predicted_notes):
     all_false_negatives += false_negative
     all_false_positives += false_positive
     all_true_positives += true_positive
-    total_actual_notes += actual_notes
-    total_predicted_notes += predicted_notes
+    total_actual_notes += len(actual_notes)
+    total_predicted_notes += len(predicted_notes)
     print("=======================================================================")
     print(f"Total number of actual notes: {len(actual_notes)}")
     print(f"Total number of predicted notes: {len(predicted_notes)}")
@@ -128,15 +149,19 @@ def final_result():
     f1 = 0
 
     # Metrics
-    precision = all_true_positives / (all_true_positives + all_false_positives)
-    recall = all_true_positives / (all_true_positives + all_false_negatives)
+    if (all_true_positives + all_false_positives) > 0:
+        precision = all_true_positives / (all_true_positives + all_false_positives)
+    
+    if (all_true_positives + all_false_negatives) > 0:
+        recall = all_true_positives / (all_true_positives + all_false_negatives)
+        
     if (precision + recall > 0):
         f1 = (2 * precision * recall) / (precision + recall)
     
     print("                        ~~~~Final Result~~~~                           ")
     print("=======================================================================")
-    print(f"Total number of actual notes: {len(total_actual_notes)}")
-    print(f"Total number of predicted notes: {len(total_predicted_notes)}")
+    print(f"Total number of actual notes: {(total_actual_notes)}")
+    print(f"Total number of predicted notes: {(total_predicted_notes)}")
     print("•••••")
     print(f"True Positives: {all_true_positives}")
     print(f"False Positives: {all_false_positives}")
@@ -166,7 +191,7 @@ def evaluate_process():
     jam_files = [f for f in listdir(path) if isfile(join(path, f))]
     # audio_files = [a for a in listdir(audio_path) if isfile(join(audio_path, a))]
     
-    for jam_path in jam_files[:5]:
+    for jam_path in jam_files:
         print(f"Processing: {jam_path}")
         jam_file_path = join(path, jam_path)
         actual_notes = load_guitarset(jam_file_path)
@@ -185,14 +210,19 @@ def evaluate_process():
         # Basic pitch detection ~ Spotify
         model_output, midi_data, note_events = pitch_detection(audio_file_path)
         
-        predicted_notes = filter_process(note_events)
+        if not note_events:
+                print(f"Error: No notes detected in audio for {audio_filename}")
+                continue
+        predicted_notes = note_events
+        # predicted_notes = filter_process(note_events)
         
         if not note_events:
             return "error: No notes detected in audio"
         if (predicted_notes == None):
             print(f"No predicted notes found in {predicted_notes}")
         else:
-            metrics_result(actual_notes, predicted_notes)
+            # metrics_result(actual_notes, predicted_notes)
+            evaluate_mir(actual_notes, predicted_notes)
     final_result()
          
 def main():

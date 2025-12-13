@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" version="29.1.1">
+  <diagram name="Page-1" id="LBkYJpyTfjV7_AD3LGKd">
+    <mxGraphModel dx="1925" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-1" edge="1" parent="1" source="7f5ddi7AVS2YcQJpJksy-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="7f5ddi7AVS2YcQJpJksy-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7f5ddi7AVS2YcQJpJksy-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Input Sequence&lt;div&gt;(Batch, 11 notes)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="55" width="105" x="-339" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="7f5ddi7AVS2YcQJpJksy-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=14;" value="FretBoardCNN Architecture" vertex="1">
+          <mxGeometry height="10" width="220" x="61" y="119" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-10" edge="1" parent="1" source="7f5ddi7AVS2YcQJpJksy-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="7f5ddi7AVS2YcQJpJksy-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7f5ddi7AVS2YcQJpJksy-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Embedding Layer&lt;div&gt;(Batch, 32, 11)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="55" width="107" x="-200" y="185" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-11" edge="1" parent="1" source="7f5ddi7AVS2YcQJpJksy-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="Vh5v-eTfLJ4VQG67otHv-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7f5ddi7AVS2YcQJpJksy-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Start Conv1d Layer&lt;div&gt;(kernel=3, channels=64)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="-49" y="182" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-5" edge="1" parent="1" source="7f5ddi7AVS2YcQJpJksy-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="7f5ddi7AVS2YcQJpJksy-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-7" edge="1" parent="1" source="7f5ddi7AVS2YcQJpJksy-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="7f5ddi7AVS2YcQJpJksy-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7f5ddi7AVS2YcQJpJksy-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Flatten" vertex="1">
+          <mxGeometry height="38" width="69" x="411" y="193" as="geometry" />
+        </mxCell>
+        <mxCell id="7f5ddi7AVS2YcQJpJksy-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D0F1F8;strokeColor=light-dark(#51b6b8, #d7817e);" value="Dropout" vertex="1">
+          <mxGeometry height="43" width="80" x="506" y="191" as="geometry" />
+        </mxCell>
+        <mxCell id="7f5ddi7AVS2YcQJpJksy-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Fret + String&lt;br&gt;&lt;div&gt;(150 classes)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="80" x="618" y="192" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-13" edge="1" parent="1" source="Vh5v-eTfLJ4VQG67otHv-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="Vh5v-eTfLJ4VQG67otHv-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Hidden Conv1d Layer&lt;div&gt;(kernel=3, channels=128&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="110" y="182" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-14" edge="1" parent="1" source="Vh5v-eTfLJ4VQG67otHv-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="7f5ddi7AVS2YcQJpJksy-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vh5v-eTfLJ4VQG67otHv-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Output Conv1d Layer&lt;div&gt;(kernel=3, channels=256&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="261" y="182" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
