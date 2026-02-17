@@ -267,7 +267,7 @@ def evaluate_process():
     basic_pitch_model = Model(ICASSP_2022_MODEL_PATH)
     
     # Exact path to your model file
-    model_path = os.path.join(project_root, "backend", "models", "models", "best_fretboard_cnn.pt")
+    model_path = os.path.join(project_root, "backend", "models", "models", "hpc_model.pt")
 
     try:
         mapper = FretBoardMapper(model_path=model_path)
@@ -331,9 +331,10 @@ def evaluate_process():
 
     if matches_found == 0:
         print("\nNo matches found. Ensure the JAMS and Audio folder names are identical.")
-    
+        
     precision, recall, f1 = metric()
     final_result(precision, recall, f1)
+
 
 def final_result(precision, recall, f1):
     print("                        ~~~~Final Result For FretBoard Mapping~~~~                          ")

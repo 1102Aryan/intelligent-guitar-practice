@@ -97,9 +97,6 @@ def format_to_fretboard(note_events, mapper):
     predicted_notes = []
     for note_event, position in zip(note_events, mapped):
         
-        # --- THE FIX ---
-        # Your CNN output (position[0]) is already the correct string number (1-6).
-        # We just ensure it is an integer.
         guitar_string_num = int(position[0])
         
         predicted_notes.append({

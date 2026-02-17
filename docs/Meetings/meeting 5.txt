@@ -1,0 +1,29 @@
+Plan for Friday meeting
+Dissertation
+fixing bugs and issues - musicxml file, pdf export
+optimised hybrid 
+creating a GOAT dataset
+presentation
+ 
+
+
+Resources used:
+
+
+
+
+[Notes from meeNovice players ight not know how to play. but expert might know ting]
+or
+correction, reinforcement 
+gamefiying - training tool  (they make a training device to help train the transcription system changing the purpose)
+ress wannan - duolingo
+turning the data into useful learning experience 
+AMT to decent level fidelity. realizing how it might be a big challenge.
+ear training practice based on correction. that user makes reinforcement learning will be used to automatically transcript tablature. 
+evaluation 
+user evaluation proficient musicians. ear, compare. how would you evaluate as successful . based on wav file and transcription. 
+editing tool  
+midi library (mido) not necessarily need web audio browser 
+System that checks for correctness. provide the right answer. flag if incorrect or correct. research. train model back. come up with right answers over time. fragments which user correct. eventually get the right answer
+corswd sourcing information - doing something difference. never know if tablature is right.
+Ultimate guitar selling interactive scores. hearing them and listening them to the original. tell if they are correct or not . multiple versions. 

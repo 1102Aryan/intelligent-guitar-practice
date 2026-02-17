@@ -28,6 +28,8 @@ class Tab:
             
     @staticmethod
     def display_ascii_tab(note_data, time_signature=4):
+        output_lines = []
+        
         tab = [["E|"],
                ["B|"],
                ["G|"],
@@ -35,22 +37,10 @@ class Tab:
                ["A|"],
                ["e|"] 
         ]
-        beat_line = ["  "]
         steps = 0 
         time_sig_count = 0
-        beat_counter = 0
-        beat_step = 1
         max_line = 8 * time_signature
         for group in note_data:
-            if beat_counter % 2 == 0:
-                time_label = str(beat_step)
-                beat_step += 1
-                if beat_step > time_signature:
-                    beat_step = 1
-            else:
-                time_label = "+"
-            beat_line.append(time_label.rjust(2))
-            beat_counter += 1
             string_to_fret = {}
             for note in group:
                 (string, fret) = note[1]
@@ -64,30 +54,27 @@ class Tab:
                     tab[guitar_string].append(" -")
             time_sig_count += 1
             if time_sig_count == time_signature * 2:
-                beat_line.append("|")
                 for tab_line in tab:
                     tab_line.append("|")
                 time_sig_count = 0
+                
             steps += 1
             if steps == max_line:
-                print(' '.join(beat_line))
                 for tab_line in tab: 
                     tab_line.append("|")
-                    print(' '.join(tab_line))
-                    print()
-                print()
-                print()
+                    output_lines.append(' '.join(tab_line))
+                output_lines.append("")
+                output_lines.append("")
+                
                 tab = [["E|"], ["B|"], ["G|"], ["D|"], ["A|"], ["e|"]]
-                beat_line = ["  "]
                 steps = 0
         if steps > 0:
-            beat_line.append(" |")
             for tab_line in tab:
                 tab_line.append(" |")
-            print(' '.join(beat_line))
             for tab_line in tab:
                 tab_line.append("|")
-                print(' '.join(tab_line))
-            print()
+                output_lines.append(' '.join(tab_line))
+            output_lines.append("")
+        return "\n".join(output_lines)
 
 

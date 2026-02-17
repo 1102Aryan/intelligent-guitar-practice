@@ -42,10 +42,20 @@ docs/Project Plan.docx
 # Songs 
 examples/
 *.wav
+*.mp3
 *.flac
+
+# Numpy 
+*.npy
+*.npz
+
+# Guitar Software 
+*.gp5
 
 # Testing data
 resources/
+backend/resources/GOAT/
+backend\resources\all_jams_midi_V2_60000_tracks
 *.jams
 
 # Unit test / coverage reports

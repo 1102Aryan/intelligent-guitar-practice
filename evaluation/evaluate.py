@@ -172,11 +172,7 @@ def final_result():
     print(f"The F1-Score of the model: {f1:.4f}")
     print("=======================================================================")
     print()
-    
-        
-    
-    
-    
+
 
 def evaluate_process():
     """
