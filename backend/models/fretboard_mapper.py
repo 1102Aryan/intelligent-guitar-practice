@@ -1,7 +1,7 @@
 import torch
 import os
 import sys
-from .fretboard_cnn import FretBoardCNN
+from backend.models.synthtab.fretboard_cnn import FretBoardCNN
 
 
 
@@ -11,7 +11,6 @@ class FretBoardMapper:
         checkpoint = torch.load(model_path, map_location=self.device)
         self.model = FretBoardCNN(5, 32)
         #context = checkpoint.get('context_window', 5)
-        self.model.load_state_dict(checkpoint['model_state_dict'])
         if 'model_state_dict' in checkpoint:
             self.model.load_state_dict(checkpoint['model_state_dict'])
         else:
@@ -71,6 +70,9 @@ class FretBoardMapper:
                 if isinstance(result, tuple):
                     print(f"Tuple length: {len(result)}")
                     logits = result
+                    string_logits, fret_logits = logits
+                    string = torch.argmax(string_logits, dim=1).item() + 1
+                    fret = torch.argmax(fret_logits, dim=1).item()
                     
                 else:
                     print(f"ERROR: Got {type(result)} instead of tuple!")

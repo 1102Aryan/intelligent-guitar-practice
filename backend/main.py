@@ -10,13 +10,14 @@ from backend.core.audio_loader import audio_loader
 from backend.visualisation.plots import *
 from backend.core.pitch_detector import *
 from backend.tablature.fretboard_mapper import *
+from backend.models import fretboard_mapper
 from backend.tablature.tab_generator import *
 from backend.analysis.note_filters import *
 from backend.analysis.audio_seperation import *
-# from backend.models.fretboard_mapper import FretBoardMapper
+from backend.tablature.fretboard_mapper import all_midi_notes
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(os.path.dirname(current_dir))
+project_root = os.path.dirname(current_dir)
 if project_root not in sys.path:
     sys.path.append(project_root)
 
@@ -24,7 +25,7 @@ try:
     from backend.models.goat.goat_cnn import GoatFretboardCNN
 except ImportError:
     sys.path.append(os.path.join(project_root, "backend", "models", "goat"))
-MODEL_PATH = r"C:\Users\aryan\Disseratation\intelligent-guitar-practice\backend\models\models\goat_epoch_50.pth"
+MODEL_PATH = os.path.join(project_root, "backend", "models", "models", "goat_epoch_50.pth")
 STANDARD_TUNING = {1: 64, 2: 59, 3: 55, 4: 50, 5: 45, 6: 40}
 
 
@@ -179,10 +180,8 @@ def get_goat_predictions(audio_path, model, device):
     return mapped_notes
 
 
-            
 
-
-def automatic_music_transcription(file_path, tuning, min_confidence=0.5, min_duration=0.05, output_dir="outputs"):
+def automatic_music_transcription(file_path, tuning, model_choice, min_confidence=0.5, min_duration=0.05, output_dir="outputs"):
     """
     Main function to handle transcription
     
@@ -206,32 +205,60 @@ def automatic_music_transcription(file_path, tuning, min_confidence=0.5, min_dur
         sf.write("processed.wav", audio_signal, sample_rate)
         file_path = "processed.wav"
         
-        # Basic pitch detection ~ Spotify
-        model_output, midi_data, note_events = pitch_detection(file_path)
-        if not note_events:
-            return "error: No notes detected in audio"
         
-        # Processes the note events
-        filtered_notes = filter_process(note_events)
-        
-        # Code for running FretBoardCNN
-        # list of midi
-        mapper = FretBoardMapper()
-        midi_list = [note[2] for note in filtered_notes]
-        mapped = mapper.map_notes(midi_list)
-
-        # Create flat list of (note_event, position) tuples
         mapped_notes = []
-        for note_event, position in zip(filtered_notes, mapped):
-            mapped_notes.append((note_event, position)) 
+        if model_choice == "End-to-End Architecture (GOAT Dataset)":
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            model = GoatFretboardCNN().to(device)
+            if os.path.exists(MODEL_PATH):
+                model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+                model.eval()
+            else:
+                return f"error: Model not found at {MODEL_PATH}"
+            mapped_notes =  get_goat_predictions(file_path, model, device)
+            
+        elif model_choice == "Heuristic (Baseline)":
+            # Basic pitch detection ~ Spotify
+            model_output, midi_data, note_events = pitch_detection(file_path)
+            if not note_events:
+                return "error: No notes detected in audio"
+            # Processes the note events
+            filtered_notes = filter_process(note_events)
+            
+            # Code for running FretBoardCNN
+            # list of midi
+            print("Sample note:", filtered_notes[0])
+
+            mapped_notes = all_midi_notes(filtered_notes, STANDARD_TUNING)
+
+            # Create flat list of (note_event, position) tuples
+            
+            
+        elif model_choice == "Sequential Architecture (SynthDataset)":
+            # Basic pitch detection ~ Spotify
+            model_output, midi_data, note_events = pitch_detection(file_path)
+            if not note_events:
+                return "error: No notes detected in audio"        
+            # Processes the note events
+            filtered_notes = filter_process(note_events)
+            
+            # Code for running FretBoardCNN
+            # list of midi
+            mapper = fretboard_mapper.FretBoardMapper()
+            midi_list = [note[2] for note in filtered_notes]
+            mapped = mapper.map_notes(midi_list)
+ 
+            # Create flat list of (note_event, position) tuples
+            mapped_notes = []
+            for note_event, position in zip(filtered_notes, mapped):
+                mapped_notes.append((note_event, position)) 
+        else:
+            return f"error: Invalid model choice selected: {model_choice}"
+                
 
         print(f"Created {len(mapped_notes)} mapped notes")
         
-        # fretboard mapping
-        # mapped_notes = all_midi_notes(filtered_notes, tuning)
-        
-        # if not mapped_notes:
-        #     return "could not map notes to fretboard"
+
         # sorted_notes = sorted_notes(mapped_notes)
         grouped_notes = group_notes(mapped_notes)
                 
@@ -241,47 +268,6 @@ def automatic_music_transcription(file_path, tuning, min_confidence=0.5, min_dur
         return full_tab
     except Exception as e:
         return str(e)   
-    
-def goat_music_transcription(file_path, tuning, min_confidence=0.15, min_duration=0.05, output_dirs="outputs"):
-    """
-    Main function to handle transcription using GOAT CNN
-    """
-    try:
-        audio_path = Path(file_path)
-        if (not audio_path.exists()):
-            return f"error: audio file not found: {audio_path}"
-        
-        print(f"--- Processing {audio_path.name} ---")
-
-        # 1. SETUP MODEL
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print(f"Loading GOAT Model on {device}...")
-        
-        model = GoatFretboardCNN().to(device)
-        if os.path.exists(MODEL_PATH):
-            model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
-            model.eval()
-        else:
-            return f"CRITICAL ERROR: Model not found at {MODEL_PATH}"
-
-        # 2. RUN INFERENCE (Replaces Pitch Detection + Mapper)
-        mapped_notes = get_goat_predictions(file_path, model, device)
-
-        if not mapped_notes:
-            return "error: No notes detected by GOAT model."
-
-        print(f"GOAT Model predicted {len(mapped_notes)} notes.")
-
-        # 3. GENERATE TAB (Existing Logic)
-        grouped_notes = group_notes(mapped_notes)
-        full_tab = Tab.display_ascii_tab(grouped_notes)
-        
-        return full_tab
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return str(e)
 
 def main():
     """
@@ -309,7 +295,7 @@ def main():
         file_path = get_guitar_audio(args.file_path, "mdx_extra_q")
     else:
         file_path = args.file_path
-    result = automatic_music_transcription(file_path, current_tuning)
+    result = automatic_music_transcription(file_path, current_tuning, model_choice="End-to-End Architecture (GOAT Dataset)")
     print(result)
  
     

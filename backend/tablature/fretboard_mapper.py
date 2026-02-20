@@ -94,7 +94,8 @@ def all_midi_notes(note_events, tuning_type):
     positions = []
     prev_pos = None
     for note in note_events:
-        onset, offset, pitch_midi, velocity, confidence = note
+        onset, offset, pitch_midi, velocity = note[0], note[1], note[2], note[3]
+        pitch_midi = pitch_midi[0] if isinstance(pitch_midi, list) else pitch_midi
         candidates = map_note_to_fret(pitch_midi, tuning=tuning_type)
         if not candidates:
             continue
