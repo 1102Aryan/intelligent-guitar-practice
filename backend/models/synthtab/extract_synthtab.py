@@ -7,14 +7,11 @@ import numpy as np
 class ExtractSynthTab(Dataset):
     """
     Dataset class to extract guitar tabs from JAMS files.
-    Handles 'note_tab' namespace, dictionary-based values, and Sandbox object quirks.
     """
     def __init__(self, file_path, context_window=5, max_files=10):
         self.context_window = context_window
         self.samples = []
         
-        # Tuning mapping (Open MIDI Note -> String Index 0-5)
-        # 0 = High E (64), 5 = Low E (40)
         self.tuning_to_string = {
             64: 0,  # High E
             59: 1,  # B
@@ -24,29 +21,29 @@ class ExtractSynthTab(Dataset):
             40: 5   # Low E
         }
 
-        # 1. Setup Path
+        # Path setup
         abs_path = os.path.abspath(file_path)
         print(f"Scanning directory: {abs_path}")
         
-        # 2. Find JAMS files recursively
+        # Searching JAM files
         jam_files = []
         for root, dirs, files in os.walk(abs_path):
             for f in files:
                 if f.endswith(".jams"):
                     jam_files.append(os.path.join(root, f))
-        
+        # shortens to max files number
         if max_files:
             jam_files = jam_files[:max_files]
             
         print(f"Found {len(jam_files)} JAMS files. Processing...")
 
-        # 3. Extract Data
+        # Collect Information
         for i, jam_path in enumerate(jam_files):
             if i % 10 == 0 and i > 0:
                 print(f"  Processed {i}/{len(jam_files)} files...")
             self._extract_from_jams(jam_path)
             
-        print(f"Extraction complete. Total samples: {len(self.samples)}")
+        print(f"Extraction complete! Total samples found: {len(self.samples)}")
 
     def _extract_from_jams(self, jam_path):
         """
@@ -54,7 +51,7 @@ class ExtractSynthTab(Dataset):
         Handles validation=False and getattr for Sandbox.
         """
         try:
-            # 1. Load without validation (prevents crash on 'note_tab')
+            # Load files
             jam = jams.load(jam_path, validate=False)
             all_notes = []
 
@@ -63,19 +60,13 @@ class ExtractSynthTab(Dataset):
                 if annotation.namespace != 'note_tab':
                     continue
                 
-                # 2. FIX: Use getattr() instead of .get() for Sandbox objects
                 sandbox = annotation.sandbox
-                
-                # Try to get open_tuning safely
                 open_tuning = getattr(sandbox, 'open_tuning', None)
                 
-                # If tuning is missing, check if 'string_index' exists
                 if open_tuning is None:
                     s_idx = getattr(sandbox, 'string_index', None)
                     if s_idx is not None:
-                        # Fallback map: Assume string_index is 1-6 or 0-5
-                        # Adjust this based on your specific dataset if needed
-                        # Here assuming 1=High E (64) down to 6=Low E (40)
+                    
                         fallback_map = {1: 64, 2: 59, 3: 55, 4: 50, 5: 45, 6: 40}
                         # If keys are 0-5 instead:
                         if int(s_idx) == 0: fallback_map = {0: 40, 1: 45, 2: 50, 3: 55, 4: 59, 5: 64}
@@ -87,13 +78,10 @@ class ExtractSynthTab(Dataset):
                     
                 string_idx = self.tuning_to_string[open_tuning]
 
-                # 3. Extract notes
+                # Extract notes
                 for obs in annotation.data:
                     fret = None
-                    
-                    # Handle Dictionary Value: {"fret": 3, "velocity": 95}
-                    # Note: obs.value IS usually a dict, so .get works here.
-                    # If obs.value is also a Sandbox object, we try getattr as fallback.
+
                     if isinstance(obs.value, dict):
                         fret = obs.value.get('fret')
                     elif hasattr(obs.value, 'fret'):
@@ -104,7 +92,7 @@ class ExtractSynthTab(Dataset):
                     if fret is None:
                         continue
                         
-                    # Calculate MIDI pitch (Open String + Fret)
+                    # Calculate MIDI pitch based on Open String + Fret
                     midi_pitch = int(open_tuning + fret)
                     
                     if 0 <= fret <= 24:
@@ -115,10 +103,10 @@ class ExtractSynthTab(Dataset):
                             'time': obs.time 
                         })
 
-            # Sort by time
+            # ascennding order based on onset time
             all_notes.sort(key=lambda x: x['time'])
 
-            # Create context windows
+            # Create context windows 
             for i in range(len(all_notes)):
                 context = self._get_context(all_notes, i)
                 self.samples.append({
@@ -126,14 +114,15 @@ class ExtractSynthTab(Dataset):
                     'string': all_notes[i]['string'],
                     'fret': all_notes[i]['fret']
                 })
-
+        # Catch error if fails
         except Exception as e:
-            # Print specific error to help debug if it fails again
             print(f"Error reading {os.path.basename(jam_path)}: {e}")
 
     def _get_context(self, notes, idx):
         """
         Get context window around current note
+        return:
+            context
         """
         context = []
         # Previous notes

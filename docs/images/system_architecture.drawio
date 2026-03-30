@@ -1,0 +1,114 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0" version="29.5.1">
+  <diagram name="Page-1" id="1K8XIReOWOuFDPNFCEj-">
+    <mxGraphModel dx="996" dy="676" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-47" edge="1" parent="1" source="Vq-lAGc91BbT0na5H2lR-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="170" y="90" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-1" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="User" vertex="1">
+          <mxGeometry height="60" width="30" x="50" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-26" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" target="Vq-lAGc91BbT0na5H2lR-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="318" y="170" />
+              <mxPoint x="318" y="210" />
+              <mxPoint x="317" y="210" />
+            </Array>
+            <mxPoint x="318" y="170" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-8" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="View - PySide6 GUI" vertex="1">
+          <mxGeometry height="140" width="580" x="170" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-13" parent="Vq-lAGc91BbT0na5H2lR-8" style="rounded=1;whiteSpace=wrap;html=1;" value="Model Dropdown" vertex="1">
+          <mxGeometry height="30" width="151" x="214.5" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-16" parent="Vq-lAGc91BbT0na5H2lR-8" style="rounded=1;whiteSpace=wrap;html=1;" value="Toolbar" vertex="1">
+          <mxGeometry height="30" width="151" x="214.5" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-17" parent="Vq-lAGc91BbT0na5H2lR-8" style="rounded=1;whiteSpace=wrap;html=1;" value="File Upload" vertex="1">
+          <mxGeometry height="30" width="150" x="30" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-18" parent="Vq-lAGc91BbT0na5H2lR-8" style="rounded=1;whiteSpace=wrap;html=1;" value="Export" vertex="1">
+          <mxGeometry height="30" width="150" x="30" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-44" parent="Vq-lAGc91BbT0na5H2lR-8" style="rounded=1;whiteSpace=wrap;html=1;" value="ASCII Tab Editor" vertex="1">
+          <mxGeometry height="30" width="149" x="400" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-45" parent="Vq-lAGc91BbT0na5H2lR-8" style="rounded=1;whiteSpace=wrap;html=1;" value="Media Player" vertex="1">
+          <mxGeometry height="30" width="149" x="400" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-25" edge="1" parent="1" source="Vq-lAGc91BbT0na5H2lR-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="613" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-29" edge="1" parent="1" source="Vq-lAGc91BbT0na5H2lR-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" target="Vq-lAGc91BbT0na5H2lR-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-9" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Controller" vertex="1">
+          <mxGeometry height="140" width="590" x="170" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-23" edge="1" parent="Vq-lAGc91BbT0na5H2lR-9" source="Vq-lAGc91BbT0na5H2lR-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="Vq-lAGc91BbT0na5H2lR-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-19" parent="Vq-lAGc91BbT0na5H2lR-9" style="rounded=1;whiteSpace=wrap;html=1;" value="Event Handle&lt;div&gt;TranscriptionWorker (QThread)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="170" x="10" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-24" edge="1" parent="Vq-lAGc91BbT0na5H2lR-9" source="Vq-lAGc91BbT0na5H2lR-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="Vq-lAGc91BbT0na5H2lR-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-21" parent="Vq-lAGc91BbT0na5H2lR-9" style="rounded=1;whiteSpace=wrap;html=1;" value="Transcription Router&lt;div&gt;Model Selection&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="170" x="210" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-22" parent="Vq-lAGc91BbT0na5H2lR-9" style="rounded=1;whiteSpace=wrap;html=1;" value="Refresh Tab&lt;div&gt;Updating position mapping&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="170" x="410" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-28" edge="1" parent="1" source="Vq-lAGc91BbT0na5H2lR-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="618" y="460" />
+              <mxPoint x="618" y="420" />
+            </Array>
+            <mxPoint x="618.3157894736844" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-10" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Model - Backend" vertex="1">
+          <mxGeometry height="240" width="602" x="167" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-30" parent="Vq-lAGc91BbT0na5H2lR-10" style="rounded=1;whiteSpace=wrap;html=1;" value="Audio Processing" vertex="1">
+          <mxGeometry height="50" width="560" x="20" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-32" parent="Vq-lAGc91BbT0na5H2lR-10" style="rounded=1;whiteSpace=wrap;html=1;" value="Tab Generation" vertex="1">
+          <mxGeometry height="50" width="560" x="18" y="179" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-31" parent="Vq-lAGc91BbT0na5H2lR-10" style="rounded=1;whiteSpace=wrap;html=1;" value="Heuristic (baseline)" vertex="1">
+          <mxGeometry height="50" width="182" x="18" y="107" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-33" parent="Vq-lAGc91BbT0na5H2lR-10" style="rounded=1;whiteSpace=wrap;html=1;" value="Sequential (Synth dataset)" vertex="1">
+          <mxGeometry height="50" width="182" x="209" y="107" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-34" parent="Vq-lAGc91BbT0na5H2lR-10" style="rounded=1;whiteSpace=wrap;html=1;" value="End-to-End (GOAT dataset)" vertex="1">
+          <mxGeometry height="50" width="182" x="399" y="107" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-35" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="User clicks &quot;Transcribe&quot; button" vertex="1">
+          <mxGeometry height="30" width="140" x="170" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-36" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Sends audio path &amp;amp; model choice" vertex="1">
+          <mxGeometry height="30" width="140" x="170" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-37" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Returns mapped notes, BPM &amp;amp; tab" vertex="1">
+          <mxGeometry height="30" width="140" x="629" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="Vq-lAGc91BbT0na5H2lR-38" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Update UI state &amp;amp; tab editor" vertex="1">
+          <mxGeometry height="30" width="140" x="620" y="190" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

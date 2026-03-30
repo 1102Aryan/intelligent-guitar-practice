@@ -6,6 +6,7 @@ import pandas as pd
 import guitarpro as gp
 import soundfile as sf
 from tqdm import tqdm
+from core.harmonic_cqt import compute_harmonic_cqt
 
 
 class GOATProcessor:
@@ -52,25 +53,23 @@ class GOATProcessor:
             item_dir = os.path.join(self.dataset_path, item_name)
             gp_files = glob.glob(os.path.join(item_dir, "*.gp5"))
             if not gp_files:
-                continue # Skip if no tab found
+                continue 
             gp_path = gp_files[0]
             
-            # Find a suitable .wav file
-            # Priority: clean -> mic -> mix -> any amp
             wav_files = glob.glob(os.path.join(item_dir, "*.wav"))
             audio_path = None
             
             if not wav_files:
                 continue
 
-            # logic to pick the best audio source
+            # Picks clean wavfile, else takes the mic
             for w in wav_files:
                 if "clean" in w: audio_path = w; break
             if not audio_path:
                 for w in wav_files:
                     if "mic" in w: audio_path = w; break
             if not audio_path:
-                audio_path = wav_files[0] # Fallback to first available
+                audio_path = wav_files[0]
 
             # Process
             try:
@@ -89,10 +88,13 @@ class GOATProcessor:
         except Exception as e:
             print(f"Error parsing {gp_path}: {e}")
             return
-
+        # 22050 SR
+        CONTEXT_SAMPLES = int(1.0 * self.sr) 
+        # 11025 half of SR 
+        HALF_CONTEXT = CONTEXT_SAMPLES // 2  
+        
         current_time = 0.0
         tempo = song.tempo
-        
         ticks_per_quarter = 960
         
         events = []
@@ -115,24 +117,20 @@ class GOATProcessor:
             break
         
         for i, event in enumerate(events):
-            start_time = event["time"]
-            start_sample = int(start_time * self.sr)
+            center = int(event["time"] * self.sr)
+            start_sample = center - HALF_CONTEXT
+            end_sample = center + HALF_CONTEXT 
             
-            # Take a 0.2 second slice (approx 4410 samples)
-            end_sample = start_sample + 4410 
-            
-            if end_sample < len(y):
+            if 0 > start_sample or end_sample < len(y):
                 audio_slice = y[start_sample:end_sample]
                 
-                # Convert to Mel Spectrogram
-                mel_spec = librosa.feature.melspectrogram(y=audio_slice, sr=self.sr, n_mels=128)
-                mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
+                harmonic_cqt = compute_harmonic_cqt(audio_slice, sr=self.sr)
                 
                 # Save Data
                 # ID format: songname_index
                 file_id = f"{item_name}_{i}"
                 
-                np.save(os.path.join(self.output_dir, "specs", f"{file_id}.npy"), mel_spec_db)
+                np.save(os.path.join(self.output_dir, "specs", f"{file_id}.npy"), harmonic_cqt)
                 
                 # Label: [String (1-6), Fret (0-24)]
                 label = np.array([event["string"], event["fret"]])

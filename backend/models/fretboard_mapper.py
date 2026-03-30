@@ -1,6 +1,7 @@
 import torch
 import os
 import sys
+import numpy as np
 from backend.models.synthtab.fretboard_cnn import FretBoardCNN
 
 
@@ -109,48 +110,110 @@ class FretBoardMapper:
                 context_list.append(0)
         return torch.tensor([context_list], dtype=torch.long)
     
+    def _mask_by_midi(self, probs, midi_note):
+        """
+        Zero out classes whose string+fret doesn't produce the correct pitch.
+        Same principle as GOAT's mask_by_pitch — forces the model to choose
+        WHERE to play the note, not WHAT note to play.
+        """
+        masked = np.zeros_like(probs)
+        for cls_idx in range(150):
+            string_num = (cls_idx // 25) + 1
+            fret_num = cls_idx % 25
+            if self.fallback_tuning[string_num] + fret_num == midi_note:
+                masked[cls_idx] = probs[cls_idx]
+        # Fallback: note is outside guitar range — use raw probs
+        if masked.sum() == 0:
+            return probs
+        return masked
+
+    def _viterbi(self, probs):
+        """
+        Viterbi decoding over the sequence of per-note probability vectors.
+        Physics penalties discourage large string changes and big fret jumps,
+        producing a more playable tab than independent argmax.
+        """
+        T = len(probs)
+        if T == 0:
+            return []
+
+        log_preds = np.log(np.array(probs) + 1e-9)
+        path_prob = np.full((T, 150), -np.inf)
+        backpointer = np.zeros((T, 150), dtype=int)
+
+        path_prob[0] = log_preds[0]
+
+        for t in range(1, T):
+            prev = path_prob[t - 1]
+            top_prev = np.argsort(prev)[-20:]
+
+            for k in range(150):
+                s_curr = (k // 25) + 1
+                f_curr = k % 25
+                best_score = -np.inf
+                best_prev = 0
+
+                for j in top_prev:
+                    if prev[j] == -np.inf:
+                        continue
+                    s_prev = (j // 25) + 1
+                    f_prev = j % 25
+
+                    penalty = 0.0
+                    if s_curr != s_prev:
+                        penalty += 2.0
+                    fret_dist = abs(f_curr - f_prev)
+                    if fret_dist > 4:
+                        penalty += 0.5 * (fret_dist - 4)
+
+                    score = prev[j] + log_preds[t][k] - penalty
+                    if score > best_score:
+                        best_score = score
+                        best_prev = j
+
+                path_prob[t, k] = best_score
+                backpointer[t, k] = best_prev
+
+        best_path = []
+        curr = int(np.argmax(path_prob[T - 1]))
+        best_path.append(curr)
+        for t in range(T - 1, 0, -1):
+            curr = backpointer[t, curr]
+            best_path.append(curr)
+        best_path.reverse()
+        return best_path
+
     def map_notes(self, midi_notes):
         """
-        Runs the process for mapping notes with heuristic safety net
+        Maps a sequence of MIDI notes to (string, fret, confidence) tuples.
+
+        Pipeline:
+          1. Batch inference → softmax probabilities
+          2. Pitch masking — constrain each note to valid string/fret positions
+          3. Viterbi decoding — prefer playable sequences (same string, small fret jumps)
         """
         if not midi_notes:
             return []
-        
+
         note_tensor = torch.tensor(midi_notes, dtype=torch.long)
-        batch_input = self._create_batch(note_tensor)
-        batch_input = batch_input.to(self.device)
-        
-    
-        results = []
+        batch_input = self._create_batch(note_tensor).to(self.device)
+
         with torch.no_grad():
             logits = self.model(batch_input)
-            pred_indices = torch.argmax(logits, dim=1)
-        
-        pred_indices = pred_indices.cpu().numpy()
-        input_pitches = note_tensor.cpu().numpy()
-        open_strings_np = self.open_strings.cpu().numpy()
+            probs = torch.softmax(logits, dim=1).cpu().numpy()  # (N, 150)
 
-        for i, note in enumerate(midi_notes):
-            classes = pred_indices[i]
-            ml_string_idx = classes // 25 
-            ml_fret = classes % 25
-            ml_pos = (int(ml_string_idx + 1), int(ml_fret))
-            ml_predicted_pitch = open_strings_np[ml_string_idx] + ml_fret
-            is_ml_valid = (ml_predicted_pitch == note)
-            heuristic_pos = self._heuristic_fallback(note)
-            (h_string, h_fret) = heuristic_pos
+        # Constrain each note to positions that produce the correct pitch
+        for i, midi_note in enumerate(midi_notes):
+            probs[i] = self._mask_by_midi(probs[i], midi_note)
 
-            final_pos = ml_pos
+        best_path = self._viterbi(probs)
 
-            if not is_ml_valid:
-                final_pos = heuristic_pos
-            elif h_fret == 0:
-                if ml_fret > 4: 
-                    final_pos = heuristic_pos
-            elif h_fret <= 3 and ml_fret > 7:
-                final_pos = heuristic_pos
-
-            results.append(final_pos)
+        results = []
+        for i, idx in enumerate(best_path):
+            string_num = (idx // 25) + 1
+            fret_num = idx % 25
+            confidence = float(probs[i][idx])
+            results.append((string_num, fret_num, confidence))
 
         return results
                 

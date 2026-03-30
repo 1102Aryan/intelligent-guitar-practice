@@ -6,6 +6,9 @@ from backend.export.tab_parser import TabParser
 def export_to_midi(tab_text, output_path="temp_midi.mid"):
     """
     Parses tab and genertes a playable midi
+    Output_path set to temp_midi.mid
+    return:
+        file path of the midi file generated
     """
     parser = TabParser()
     parsed_notes = parser.parse(tab_text)
@@ -13,7 +16,7 @@ def export_to_midi(tab_text, output_path="temp_midi.mid"):
     if not parsed_notes:
         print("No notes to play.")
         return None
-    
+    # Uses pretty_midi library for formatting
     midi = pretty_midi.PrettyMIDI()
     
     guitar_program = pretty_midi.instrument_name_to_program('Electric Guitar (Clean)')
@@ -22,7 +25,7 @@ def export_to_midi(tab_text, output_path="temp_midi.mid"):
     
     current_time = 0.0
     note_duration = 0.25
-    
+    # Goes through each note
     for d in parsed_notes:
         try:
             string_idx = int(d['string_idx'])
@@ -41,6 +44,7 @@ def export_to_midi(tab_text, output_path="temp_midi.mid"):
                 start=current_time, 
                 end=current_time + note_duration
             )
+            # Formats and adds to the list
             guitar.notes.append(note)
             
         # Move the timeline forward
@@ -52,6 +56,12 @@ def export_to_midi(tab_text, output_path="temp_midi.mid"):
     return output_path
     
 def export_to_audio(tab_text, output_path="temp_midi.wav"):
+    """
+    Converts the midi file to an audio file 
+    returns:
+        output path of the audio file
+    """
+
     midi_path = export_to_midi(tab_text)
     if not midi_path:
         return None

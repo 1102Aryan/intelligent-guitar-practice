@@ -1,3 +1,5 @@
+# https://pyguitarpro.readthedocs.io/en/stable/pyguitarpro/format.html#module-guitarpro.gp5
+# https://stackoverflow.com/questions/53451286/python-reading-guitarpro-gp5-files
 import guitarpro
 from backend.export.tab_parser import TabParser
 
@@ -20,9 +22,10 @@ def export_to_gp5(tab_text, output_path="output.gp5"):
     else:
         track = guitarpro.Track(song, guitarpro.MeasureHeader())
         song.tracks.append(track)
-        
+    
+    #Set as Electric Guitar for tablature representation
     track.name = "Electric Guitar"
-    track.color = guitarpro.Color(255, 0, 0) # Red
+    track.color = guitarpro.Color(255, 0, 0)
     
     # MIDI settings
     track.channel.channel = 0 
@@ -30,15 +33,14 @@ def export_to_gp5(tab_text, output_path="output.gp5"):
     
     # 6 string guitar tunining
     track.strings = [
-        guitarpro.GuitarString(1, 64), # High E
-        guitarpro.GuitarString(2, 59), # -
-        guitarpro.GuitarString(3, 55), # -
-        guitarpro.GuitarString(4, 50), # -
-        guitarpro.GuitarString(5, 45), # -
-        guitarpro.GuitarString(6, 40)  # Low E
+        guitarpro.GuitarString(1, 64), # - High E
+        guitarpro.GuitarString(2, 59), # - B
+        guitarpro.GuitarString(3, 55), # - G
+        guitarpro.GuitarString(4, 50), # - D
+        guitarpro.GuitarString(5, 45), # - A
+        guitarpro.GuitarString(6, 40)  # - Low E
     ]
     
-    # Setting measures
     NOTES_PER_MEASURE = 8 
     num_measures = (len(parsed_notes) + NOTES_PER_MEASURE - 1) // NOTES_PER_MEASURE
     if num_measures < 1: num_measures = 1

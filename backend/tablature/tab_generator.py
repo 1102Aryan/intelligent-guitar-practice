@@ -27,7 +27,7 @@ class Tab:
     # | x  Mute note   
             
     @staticmethod
-    def display_ascii_tab(note_data, time_signature=4):
+    def display_ascii_tab(note_data, time_signature=4, subdivisions=16):
         output_lines = []
         
         tab = [["E|"],
@@ -35,15 +35,17 @@ class Tab:
                ["G|"],
                ["D|"],
                ["A|"],
-               ["e|"] 
+               ["E|"] 
         ]
+        
         steps = 0 
         time_sig_count = 0
-        max_line = 8 * time_signature
+        max_line = subdivisions
+        slots_per_beat = subdivisions // time_signature
         for group in note_data:
             string_to_fret = {}
             for note in group:
-                (string, fret) = note[1]
+                string, fret = note[1][0], note[1][1]
                 string_to_fret[string] = fret
             for guitar_string in range(len(tab)):
                 string_number = 1 + guitar_string
@@ -53,7 +55,7 @@ class Tab:
                 else:
                     tab[guitar_string].append(" -")
             time_sig_count += 1
-            if time_sig_count == time_signature * 2:
+            if time_sig_count == slots_per_beat:
                 for tab_line in tab:
                     tab_line.append("|")
                 time_sig_count = 0
@@ -66,8 +68,9 @@ class Tab:
                 output_lines.append("")
                 output_lines.append("")
                 
-                tab = [["E|"], ["B|"], ["G|"], ["D|"], ["A|"], ["e|"]]
+                tab = [["E|"], ["B|"], ["G|"], ["D|"], ["A|"], ["E|"]]
                 steps = 0
+                time_sig_count = 0
         if steps > 0:
             for tab_line in tab:
                 tab_line.append(" |")

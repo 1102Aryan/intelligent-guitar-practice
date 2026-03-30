@@ -16,7 +16,7 @@ def onset_graph(audio, onset_time, sample_rate):
     plt.tight_layout()
     plt.show()
     
-
+    
 def spectogram(audio):
     # Creates a spectogram of the audio for representation.
     D = librosa.stft(audio)

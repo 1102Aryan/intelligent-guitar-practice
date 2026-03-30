@@ -20,12 +20,13 @@ AUDIO_ROOT = os.path.join(project_root, "backend", "resources", "audio_mono-mic"
 # Jam path
 JAM_ROOT = os.path.join(project_root, "backend", "resources", "annotation")
 # Model path
-MODEL_PATH = os.path.join(project_root, "backend", "models", "models", "goat_epoch_50.pth")
+MODEL_PATH = os.path.join(project_root, "backend", "models", "models", "goat_3.pth")
+
  
 
 
 from backend.models.goat.goat_cnn import GoatFretboardCNN
-
+from backend.models.goat.goat_prediction import get_goat_predictions
 
 
 
@@ -127,55 +128,12 @@ def get_cnn_predicted_notes(audio_path, model, device):
     if not os.path.exists(audio_path):
         return []
 
-    y, sr = librosa.load(audio_path, sr=22050)
-    
-    # onset frames
-    onset_f = librosa.onset.onset_detect(y=y, sr=sr, wait=1, pre_avg=3, post_avg=3, delta=0.05)
-    # onset times
-    onset_t = librosa.frames_to_time(onset_f, sr=sr)
-    
+    predicted_notes_goat = get_goat_predictions(audio_path, model, device)
     predicted_notes = []
-    
-    MIN_WIDTH = 9
-    
-    for start_t in onset_t:
-        # short audio slide = 0.2 seconds
-        start_sample = int(start_t * sr)
-        end_sample = start_sample + 4410
-        if end_sample >= len(y):
-            break
-        
-        audio_slice = y[start_sample:end_sample]
-        
-        if np.max(np.abs(audio_slice)) > 0:
-            audio_slice = audio_slice / np.max(np.abs(audio_slice))
-        
-        spectrogram = librosa.feature.melspectrogram(y=audio_slice, sr=22050, n_mels=128)
-        spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
-        
-        current_width = spectrogram_db.shape[1]
-        if current_width < MIN_WIDTH:
-            padding = MIN_WIDTH - current_width
-            spectrogram_db = np.pad(spectrogram_db, ((0,0), (0, padding)), mode='constant')
-            
-        tensor = torch.tensor(spectrogram_db, dtype=torch.float32).unsqueeze(0).unsqueeze(0).to(device)
-        
-        with torch.no_grad():
-            output = model(tensor)
-            probs = torch.sigmoid(output).cpu().numpy().flatten()
-        
-        best_idx = probs.argmax()
-        confidence = probs[best_idx]
-        
-        if confidence > 0.15:
-            string_num = (best_idx // 25) + 1
-            fret_num = best_idx % 25
-            
-            midi_val = STANDARD_TUNING[string_num] + fret_num
-            
+    for note_events, (string_num, fret_num) in predicted_notes_goat:            
             predicted_notes.append({
-                'onset': start_t,
-                'midi_value': midi_val,
+                'onset': note_events[0],
+                'midi_value': note_events[2],
                 'string': string_num,
                 'fret': fret_num
             })
@@ -188,19 +146,23 @@ def compare(actual_notes, predicted_notes, time_threshold=0.1):
         results of true positive, false positive, false negative, string distance, fret distance and pitch matches
     """
     local_tp = 0
+    local_fp = 0
     local_fn = 0
     local_sd = 0
+    local_pitch_tp = 0
     local_fd = 0
     local_pitch_matches = 0
     
-    matched_indices = set()
+    matched_prediction_indices = set()
+    matched_actual_indices = set()
     
-    for actual in actual_notes:
+    for x, actual in enumerate(actual_notes):
         best_match_idx = -1
         min_diff = float('inf')
         
         for i, pred in enumerate(predicted_notes):
-            if i in matched_indices: continue
+            if i in matched_prediction_indices:
+                continue
             
             diff = abs(actual['onset'] - pred['onset'])
             pitch_diff = abs(actual['midi_value'] - pred['midi_value'])
@@ -210,7 +172,8 @@ def compare(actual_notes, predicted_notes, time_threshold=0.1):
                     best_match_idx = i
         
         if best_match_idx != -1:
-            matched_indices.add(best_match_idx)
+            matched_prediction_indices.add(best_match_idx)
+            matched_actual_indices.add(x)
             pred = predicted_notes[best_match_idx]
             
             local_pitch_matches += 1
@@ -222,14 +185,9 @@ def compare(actual_notes, predicted_notes, time_threshold=0.1):
             if ds == 0 and df == 0:
                 # correct note and fret placement
                 local_tp += 1
-            else:
-                # correct note, incorrect fret placement
-                local_fn += 1 
-        else:
-            # incorrect note
-            local_fn += 1
-            
-    local_fp = len(predicted_notes) - len(matched_indices)
+
+    local_fn = len(actual_notes) - len(matched_actual_indices)
+    local_fp = len(predicted_notes) - len(matched_prediction_indices)
     return local_tp, local_fp, local_fn, local_sd, local_fd, local_pitch_matches
 
 def metric():
@@ -243,6 +201,7 @@ def metric():
         f1 = (2 * precision * recall) / (precision + recall)
     else: f1 = 0
     return precision, recall, f1
+
 
 def evaluate_process():
     """
@@ -316,16 +275,19 @@ def final_result(precision, recall, f1):
     print("=======================================================================")
     print(f"Total number of actual notes: {total_actual_notes}")
     print(f"Total number of predicted notes: {total_predicted_notes}")
+    print(f"Pitch matches (correct note, any position): {total_pitch_matches}")
     print("•••••")
     
+    pitch_recall = total_pitch_matches / total_actual_notes if total_actual_notes > 0 else 0
+    print(f"Pitch Detection Recall: {pitch_recall*100:.2f}%")
+    print(f"  ({total_pitch_matches} of {total_actual_notes} actual notes detected)")
+    print()
     if total_pitch_matches > 0:
         fretboard_accuracy = all_true_positives / total_pitch_matches
         avg_string_error = total_string_distance / total_pitch_matches
         avg_fret_error = total_fret_distance / total_pitch_matches
     else:
         fretboard_accuracy = 0
-        avg_string_error = 0
-        avg_fret_error = 0
     print(f"Fretboard Exact Match Accuracy: {fretboard_accuracy*100:.4f}%")
     print(f"  (Of the notes properly detected, {fretboard_accuracy*100:.4f}% were placed on correct String/Fret)")
     print("•••••")
@@ -333,6 +295,10 @@ def final_result(precision, recall, f1):
     print(f"Average Fret Distance Error:    {avg_fret_error:.2f}")
     print("=======================================================================")
     print()
+    print(f"Precision: {precision*100:.2f}%")
+    print(f"Recall:    {recall*100:.2f}%")
+    print(f"F1 Score:  {f1*100:.2f}%")
+
 
 def main():
     evaluate_process()

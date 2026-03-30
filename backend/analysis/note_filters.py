@@ -111,25 +111,37 @@ def smoothening_time(note_events, bpm=None, beat=None):
         
     
     
-def group_notes(note_events, epsilon=0.08):
+def group_notes(note_events, epsilon=0.08, bpm=120, beats_bar=4, subdivisions=16):
+    """
+    Groups not into 16th bars 
+    """
     new_note_event = []
-    current_group = [note_events[0]]
-    first_note_data, first_pos = note_events[0]
-    prev_time = first_note_data[0]
-    for item in note_events[1:]:
+    
+    seconds_per_beat = 60.0 / bpm
+    seconds_per_bar = seconds_per_beat * beats_bar
+    seconds_per_slot = seconds_per_bar / subdivisions
+    
+    print(f"BPM: {bpm:.1f} | Bar: {seconds_per_bar:.3f}s | Slot (16th note): {seconds_per_slot:.3f}s")
+    
+    max_time = max(note_data[0] for note_data, _ in note_events)
+    total_slots = int(max_time / seconds_per_slot) + 1
+    
+    slots = [[] for _ in range(total_slots)]
+    for item in note_events:
         note_data, position = item
-        onset_time = note_data[0]
-        # adds to the same group
-        if (onset_time - prev_time <= epsilon):
-            current_group.append(item)
-        # Creates a new group item
-        else:
-            new_note_event.append(current_group)
-            current_group = [item]
-        prev_time = onset_time
-    if current_group:
-        new_note_event.append(current_group)
-    return new_note_event
+        onset = note_data[0]
+        slot_index = int(onset / seconds_per_slot)
+        if slot_index >= total_slots:
+            continue
+        string_num = position[0]
+        while slot_index < total_slots:
+            if not any(n[1][0] == string_num for n in slots[slot_index]):
+                break
+            slot_index += 1
+        if slot_index < total_slots:
+            slots[slot_index].append(item)
+    
+    return [slot for slot in slots if slot]
 
 def detecting_removing_harmonics(note_events):
     """
@@ -137,6 +149,7 @@ def detecting_removing_harmonics(note_events):
     https://www.coursera.org/learn/audio-signal-processing/lecture/dKdt9/harmonic-model
     
     """
+    pass
 
 def filter_process(note_events, scale_notes=None):
     """

@@ -16,6 +16,7 @@ from backend.analysis.note_filters import *
 from backend.analysis.audio_seperation import *
 from backend.tablature.fretboard_mapper import all_midi_notes
 
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 if project_root not in sys.path:
@@ -23,170 +24,21 @@ if project_root not in sys.path:
 
 try:
     from backend.models.goat.goat_cnn import GoatFretboardCNN
+    from backend.models.goat.goat_prediction import get_goat_predictions
 except ImportError:
     sys.path.append(os.path.join(project_root, "backend", "models", "goat"))
-MODEL_PATH = os.path.join(project_root, "backend", "models", "models", "goat_epoch_50.pth")
+
+MODEL_PATH = os.path.join(project_root, "backend", "models", "models", "goat_3.pth")
 STANDARD_TUNING = {1: 64, 2: 59, 3: 55, 4: 50, 5: 45, 6: 40}
 
 
-import numpy as np
-
-def viterbi(predictions):
-    """
-    Viterbi decoding for guitar tab generation.
-    input: predictions (T, 150) - raw probabilities
-    output: list of best state indicies (0-149)
-    """
-    if not predictions or len(predictions) == 0:
-        return []
-
-    T = len(predictions)
-    classes = 150
-    
-    # 1. Setup in logspace
-    # Use -inf for initialization to represent 0 probability
-    log_preds = np.log(np.array(predictions) + 1e-9)
-    path_prob = np.full((T, classes), -np.inf)
-    backpointer = np.zeros((T, classes), dtype=int)
-    
-    # Initialize first step
-    path_prob[0] = log_preds[0]
-    
-    # Forward pass
-    for t in range(1, T):
-        prev_probs = path_prob[t-1]
-        curr_emission = log_preds[t]
-        
-        # Optimisation: Look at top 20 previous candidates
-        # If prev_probs is all -inf (start of silence) then handle gracefully
-        top_prev_indices = np.argsort(prev_probs)[-20:] 
-        
-        for k in range(classes):
-            s_curr, f_curr = (k // 25) + 1, (k % 25)
-            
-            best_score = float("-inf")
-            best_prev = 0
-            
-            for j in top_prev_indices:
-                # Skip impossible paths
-                if prev_probs[j] == float("-inf"):
-                    continue
-
-                s_prev, f_prev = (j // 25) + 1, (j % 25)
-                
-                # Physics penalties
-                penalty = 0.0
-                
-                # Penalty A - Changing strings (High cost)
-                if s_curr != s_prev: 
-                    penalty += 2.0 
-                
-                # Penalty B - Big fret jumps (Hand stretch)
-                fret_dist = abs(f_curr - f_prev)
-                if fret_dist > 4:
-                    penalty += 0.5 * (fret_dist - 4)
-                
-                # Score calculation
-                score = prev_probs[j] + curr_emission[k] - penalty
-                
-                if score > best_score:
-                    best_score = score
-                    best_prev = j
-            
-            path_prob[t, k] = best_score
-            backpointer[t, k] = best_prev
-            
-    # Backward pass
-    best_path = []
-    
-    # Start at the best ending state
-    best_last_state = np.argmax(path_prob[T-1])
-    best_path.append(best_last_state)
-    
-    curr = best_last_state
-    for t in range(T-1, 0, -1):
-        prev = backpointer[t, curr]
-        best_path.append(prev)
-        curr = prev
-        
-    best_path = best_path[::-1]
-    
-    return best_path
-
-
-
-
-def get_goat_predictions(audio_path, model, device):
-    """
-    Runs the CNN on the audio file to get notes.
-    """
-    y, sr = librosa.load(audio_path, sr=22050)
-    
-    # Detect Onsets Notes
-    onset_f = librosa.onset.onset_detect(y=y, sr=sr, wait=1, pre_avg=3, post_avg=3, delta=0.05)
-    onset_t = librosa.frames_to_time(onset_f, sr=sr)
-    
-    
-    all_probs = []
-    all_times = []
-    mapped_notes = []
-    MIN_WIDTH = 9
-
-    for start_t in onset_t:
-        # Slice Audio
-        start_sample = int(start_t * sr)
-        end_sample = start_sample + 4410
-        if end_sample >= len(y): break
-        
-        audio_slice = y[start_sample:end_sample]
-        
-        # Normalise volume
-        if np.max(np.abs(audio_slice)) > 0:
-            audio_slice = audio_slice / np.max(np.abs(audio_slice))
-
-        # Spectrogram
-        spectrogram = librosa.feature.melspectrogram(y=audio_slice, sr=22050, n_mels=128)
-        spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
-        
-        # Safety padding
-        if spectrogram_db.shape[1] < MIN_WIDTH:
-            pad_amt = MIN_WIDTH - spectrogram_db.shape[1]
-            spectrogram_db = np.pad(spectrogram_db, ((0,0), (0, pad_amt)), mode='constant')
-
-        tensor = torch.tensor(spectrogram_db, dtype=torch.float32).unsqueeze(0).unsqueeze(0).to(device)
-        
-        # Predict
-        with torch.no_grad():
-            output = model(tensor)
-            probs = torch.sigmoid(output).cpu().numpy().flatten()
-            all_probs.append(probs)
-            all_times.append(start_t)
-            
-        
-    best_path_indices = viterbi(all_probs)
-    for i, idx in enumerate(best_path_indices):
-        confidence = all_probs[i][idx]
-    
-        # 5. Filter (Low threshold for high recall)
-        if confidence > 0.15:
-            string_num = (idx // 25) + 1
-            fret_num = idx % 25
-            
-            midi_val = STANDARD_TUNING[string_num] + fret_num
-            note_event = [all_times[i], all_times[i] + 0.2, midi_val, float(confidence)]
-            
-            mapped_notes.append((note_event, (string_num, fret_num)))
-
-    return mapped_notes
-
-
-
-def automatic_music_transcription(file_path, tuning, model_choice, min_confidence=0.5, min_duration=0.05, output_dir="outputs"):
+def automatic_music_transcription(file_path, tuning, model_choice, use_demucs=False, min_confidence=0.5, min_duration=0.05, output_dir="outputs"):
     """
     Main function to handle transcription
-    
+
     Perimeters:
         file_path: where the file is stored
+        use_demucs: if True, run Demucs source separation before transcription
         min_confidence: the minimum accepted confidence of audio
         min_duration: the minimum accepted duration of note
         output_dir: position of output file
@@ -195,17 +47,31 @@ def automatic_music_transcription(file_path, tuning, model_choice, min_confidenc
         audio_path = Path(file_path)
         if (not audio_path.exists()):
             return f"error: audio file not found: {audio_path}"
-        
+
+        if use_demucs:
+            print("Running Demucs source separation...")
+            demucs_model = "mdx_extra_q"
+            guitar_isolation(str(audio_path), demucs_model)
+            separated_path = get_guitar_audio(str(audio_path), demucs_model)
+            if not os.path.exists(separated_path):
+                return f"error: Demucs output not found at {separated_path}"
+            audio_path = Path(separated_path)
+            print(f"Using separated guitar track: {audio_path}")
+
         audio_signal, sample_rate = audio_loader(audio_path)
-        
+
+        bpm, _ = librosa.beat.beat_track(y=audio_signal, sr=sample_rate)
+        bpm = float(bpm)
+        print(f"Current BPM: {bpm}")
+
         # Pre-processing
         # audio_signal, sample_rate = pre_process(audio_signal, sample_rate)
-        
+
         # Converts back into wav file for Basic Pitch
         sf.write("processed.wav", audio_signal, sample_rate)
         file_path = "processed.wav"
-        
-        
+
+
         mapped_notes = []
         if model_choice == "End-to-End Architecture (GOAT Dataset)":
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -215,8 +81,8 @@ def automatic_music_transcription(file_path, tuning, model_choice, min_confidenc
                 model.eval()
             else:
                 return f"error: Model not found at {MODEL_PATH}"
-            mapped_notes =  get_goat_predictions(file_path, model, device)
-            
+            mapped_notes = get_goat_predictions(file_path, model, device)
+
         elif model_choice == "Heuristic (Baseline)":
             # Basic pitch detection ~ Spotify
             model_output, midi_data, note_events = pitch_detection(file_path)
@@ -224,7 +90,7 @@ def automatic_music_transcription(file_path, tuning, model_choice, min_confidenc
                 return "error: No notes detected in audio"
             # Processes the note events
             filtered_notes = filter_process(note_events)
-            
+
             # Code for running FretBoardCNN
             # list of midi
             print("Sample note:", filtered_notes[0])
@@ -232,72 +98,81 @@ def automatic_music_transcription(file_path, tuning, model_choice, min_confidenc
             mapped_notes = all_midi_notes(filtered_notes, STANDARD_TUNING)
 
             # Create flat list of (note_event, position) tuples
-            
-            
+
+
         elif model_choice == "Sequential Architecture (SynthDataset)":
             # Basic pitch detection ~ Spotify
             model_output, midi_data, note_events = pitch_detection(file_path)
             if not note_events:
-                return "error: No notes detected in audio"        
+                return "error: No notes detected in audio"
             # Processes the note events
             filtered_notes = filter_process(note_events)
-            
+
             # Code for running FretBoardCNN
             # list of midi
             mapper = fretboard_mapper.FretBoardMapper()
             midi_list = [note[2] for note in filtered_notes]
             mapped = mapper.map_notes(midi_list)
- 
+
             # Create flat list of (note_event, position) tuples
             mapped_notes = []
             for note_event, position in zip(filtered_notes, mapped):
-                mapped_notes.append((note_event, position)) 
+                mapped_notes.append((note_event, position))
         else:
             return f"error: Invalid model choice selected: {model_choice}"
-                
+
 
         print(f"Created {len(mapped_notes)} mapped notes")
-        
+
 
         # sorted_notes = sorted_notes(mapped_notes)
-        grouped_notes = group_notes(mapped_notes)
-                
+        grouped_notes = group_notes(mapped_notes, bpm=bpm)
+
         # save_midi(audio_path)
-        
-        full_tab = Tab.display_ascii_tab(grouped_notes)
-        return full_tab
+
+        full_tab = Tab.display_ascii_tab(grouped_notes, time_signature=4, subdivisions=16)
+        return full_tab, mapped_notes, bpm
     except Exception as e:
-        return str(e)   
+        return str(e)
 
 def main():
     """
     Command line interface
     """
-    parser = argparse.ArgumentParser(
-        description='CLI for Guitar AMT')
-    parser.add_argument(
-        "file_path",
-        help="file path of audio file"    
-    )
-    audio_type = input("Is this a guitar only track (Y or N): ")
-
-    tuning = int(input("Enter number for tuning (0: Standard, 1: Drop D, 2: Open C): "))
-    current_tuning = TUNINGS[tuning]
-    capo = int(input("Enter capo position (0-12): "))
-    if (capo != 0):
-        current_tuning = capo_position(capo, current_tuning)
-        
+    parser = argparse.ArgumentParser(description='CLI for Guitar AMT')
+    parser.add_argument("file_path", help="Path to the audio file (.wav or .mp3)")
     args = parser.parse_args()
-    
-    if audio_type.upper() == "N":
-        # Sends to create guitar isolated track
-        guitar_isolation(args.file_path)
-        file_path = get_guitar_audio(args.file_path, "mdx_extra_q")
+
+    MODELS = {
+        "1": "Sequential Architecture (SynthDataset)",
+        "2": "End-to-End Architecture (GOAT Dataset)",
+        "3": "Heuristic (Baseline)",
+    }
+    print("\nSelect model:")
+    for key, name in MODELS.items():
+        print(f"  {key}) {name}")
+    model_choice_input = input("Enter number (1/2/3): ").strip()
+    model_choice = MODELS.get(model_choice_input)
+    if not model_choice:
+        print(f"Invalid choice '{model_choice_input}'. Defaulting to End-to-End Architecture.")
+        model_choice = MODELS["2"]
+
+    use_demucs_input = input("\nRun Demucs source separation first? (Y/N): ").strip().upper()
+    use_demucs = use_demucs_input == "Y"
+
+    print(f"\nRunning transcription with: {model_choice}")
+    print(f"Demucs: {'ON' if use_demucs else 'OFF'}\n")
+
+    result = automatic_music_transcription(args.file_path, None, model_choice, use_demucs=use_demucs)
+
+    if isinstance(result, tuple):
+        full_tab, mapped_notes, bpm = result
+        print(f"Detected BPM: {bpm:.1f}")
+        print(f"Notes mapped: {len(mapped_notes)}")
+        print("\n" + full_tab)
     else:
-        file_path = args.file_path
-    result = automatic_music_transcription(file_path, current_tuning, model_choice="End-to-End Architecture (GOAT Dataset)")
-    print(result)
- 
-    
+        print(result)
+
+
 if __name__ == '__main__':
-    main()    
+    main()
