@@ -135,11 +135,12 @@ class MainWindow(QMainWindow):
         
         self.btn_original_audio.clicked.connect(self.play_audio)
         self.seek_slider_original.sliderMoved.connect(self.set_audio_position)
-        
+        self.slider_midi.sliderMoved.connect(self.set_midi_position)
+
         self.media_player.positionChanged.connect(self.update_slider_position)
-        self.media_player.durationChanged.connect(self.update_slider_duration) 
-        self.player_midi.positionChanged.connect(self.update_slider_midi)   
-        self.player_midi.durationChanged.connect(self.update_slider_midi_duration) 
+        self.media_player.durationChanged.connect(self.update_slider_duration)
+        self.player_midi.positionChanged.connect(self.update_slider_midi)
+        self.player_midi.durationChanged.connect(self.update_slider_midi_duration)
         
         # Header
         lbl_title = QLabel("TRANSCRIBE AUDIO")
@@ -476,10 +477,6 @@ class MainWindow(QMainWindow):
             self.player_midi.play()
             self.btn_midi_audio.setText("||")
             
-    def update_slider_midi(self, position):
-        self.slider_midi.setValue(position)
-        total = self.player_midi.duration()
-            
     def load_audio_file(self, audio_file):
         """
         Runs once audio file selected
@@ -505,7 +502,10 @@ class MainWindow(QMainWindow):
     
     def set_audio_position(self, position):
         self.media_player.setPosition(position)
-        
+
+    def set_midi_position(self, position):
+        self.player_midi.setPosition(position)
+
     def update_slider_midi_duration(self, duration):
         self.slider_midi.setRange(0, duration)
         self.update_time_label_midi()

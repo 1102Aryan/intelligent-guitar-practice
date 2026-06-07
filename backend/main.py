@@ -25,10 +25,15 @@ if project_root not in sys.path:
 try:
     from backend.models.goat.goat_cnn import GoatFretboardCNN
     from backend.models.goat.goat_prediction import get_goat_predictions
+    from backend.models.goat_v2.goat_cnn_v2 import GoatFretboardCNNv2
+    from backend.models.goat_v2.predict_goat_v2 import get_goat_v2_predictions
 except ImportError:
     sys.path.append(os.path.join(project_root, "backend", "models", "goat"))
+    sys.path.append(os.path.join(project_root, "backend", "models", "goat_v2"))
 
-MODEL_PATH = os.path.join(project_root, "backend", "models", "models", "goat_3.pth")
+MODEL_PATH    = os.path.join(project_root, "backend", "models", "models", "goat_3.pth")
+MODEL_V2_PATH = os.path.join(project_root, "backend", "models", "models", "goat_v2_best.pth")
+TRANSITION_V2_PATH = os.path.join(project_root, "backend", "models", "models", "goat_v2_transitions.npy")
 STANDARD_TUNING = {1: 64, 2: 59, 3: 55, 4: 50, 5: 45, 6: 40}
 
 
@@ -68,12 +73,27 @@ def automatic_music_transcription(file_path, tuning, model_choice, use_demucs=Fa
         # audio_signal, sample_rate = pre_process(audio_signal, sample_rate)
 
         # Converts back into wav file for Basic Pitch
-        sf.write("processed.wav", audio_signal, sample_rate)
-        file_path = "processed.wav"
+        # Use a temp directory so the write succeeds in PyInstaller bundles
+        import tempfile
+        processed_wav = os.path.join(tempfile.gettempdir(), "processed.wav")
+        sf.write(processed_wav, audio_signal, sample_rate)
+        file_path = processed_wav
 
 
         mapped_notes = []
-        if model_choice == "End-to-End Architecture (GOAT Dataset)":
+        if model_choice == "End-to-End Architecture (GOAT v2)":
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            model = GoatFretboardCNNv2(in_channels=9).to(device)
+            if os.path.exists(MODEL_V2_PATH):
+                model.load_state_dict(torch.load(MODEL_V2_PATH, map_location=device))
+                model.eval()
+            else:
+                return f"error: GOAT v2 model not found at {MODEL_V2_PATH}"
+            mapped_notes = get_goat_v2_predictions(
+                file_path, model, device, transition_path=TRANSITION_V2_PATH
+            )
+
+        elif model_choice == "End-to-End Architecture (GOAT Dataset)":
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             model = GoatFretboardCNN().to(device)
             if os.path.exists(MODEL_PATH):
@@ -133,6 +153,8 @@ def automatic_music_transcription(file_path, tuning, model_choice, use_demucs=Fa
         full_tab = Tab.display_ascii_tab(grouped_notes, time_signature=4, subdivisions=16)
         return full_tab, mapped_notes, bpm
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return str(e)
 
 def main():
@@ -147,15 +169,16 @@ def main():
         "1": "Sequential Architecture (SynthDataset)",
         "2": "End-to-End Architecture (GOAT Dataset)",
         "3": "Heuristic (Baseline)",
+        "4": "End-to-End Architecture (GOAT v2)",
     }
     print("\nSelect model:")
     for key, name in MODELS.items():
         print(f"  {key}) {name}")
-    model_choice_input = input("Enter number (1/2/3): ").strip()
+    model_choice_input = input("Enter number (1/2/3/4): ").strip()
     model_choice = MODELS.get(model_choice_input)
     if not model_choice:
-        print(f"Invalid choice '{model_choice_input}'. Defaulting to End-to-End Architecture.")
-        model_choice = MODELS["2"]
+        print(f"Invalid choice '{model_choice_input}'. Defaulting to GOAT v2.")
+        model_choice = MODELS["4"]
 
     use_demucs_input = input("\nRun Demucs source separation first? (Y/N): ").strip().upper()
     use_demucs = use_demucs_input == "Y"

@@ -6,9 +6,23 @@ from backend.models.synthtab.fretboard_cnn import FretBoardCNN
 
 
 
+def _resolve_model_path(relative_path):
+    """Resolve a model path relative to this file, works both normally and in PyInstaller bundles."""
+    if getattr(sys, 'frozen', False):
+        # PyInstaller extracts files to sys._MEIPASS
+        base = sys._MEIPASS
+    else:
+        # Two levels up from this file: backend/models/ -> backend/ -> project root
+        base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return os.path.join(base, relative_path)
+
+
 class FretBoardMapper:
-    def __init__(self, model_path=r"backend/models/models/best_fretboard_cnn.pt"):
+    def __init__(self, model_path=None):
+        if model_path is None:
+            model_path = _resolve_model_path(os.path.join("backend", "models", "models", "best_fretboard_cnn.pt"))
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        print(f"Loading FretBoardMapper model from: {model_path}")
         checkpoint = torch.load(model_path, map_location=self.device)
         self.model = FretBoardCNN(5, 32)
         #context = checkpoint.get('context_window', 5)

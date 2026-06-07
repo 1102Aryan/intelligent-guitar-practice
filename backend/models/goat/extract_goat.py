@@ -7,16 +7,19 @@ import guitarpro as gp
 import soundfile as sf
 from tqdm import tqdm
 from core.harmonic_cqt import compute_harmonic_cqt
+from core.audio_augmentation import augment_audio
 
 
 class GOATProcessor:
-    def __init__(self, dataset_path, output_dir):
+    def __init__(self, dataset_path, output_dir, augment=True, n_augmentations=3):
         self.output_dir = output_dir
         self.metadata_csv = os.path.join(output_dir, 'metadata.csv')
         self.dataset_path = dataset_path
         self.sr = 22050
         self.hop_length = 512
-        
+        self.augment = augment
+        self.n_augmentations = n_augmentations
+
         os.makedirs(os.path.join(self.output_dir, "specs"), exist_ok=True)
         os.makedirs(os.path.join(self.output_dir, "labels"), exist_ok=True)
         
@@ -116,24 +119,32 @@ class GOATProcessor:
                     current_time += duration
             break
         
+        label_dir = os.path.join(self.output_dir, "labels")
+        spec_dir = os.path.join(self.output_dir, "specs")
+
         for i, event in enumerate(events):
             center = int(event["time"] * self.sr)
             start_sample = center - HALF_CONTEXT
-            end_sample = center + HALF_CONTEXT 
-            
+            end_sample = center + HALF_CONTEXT
+
             if 0 > start_sample or end_sample < len(y):
                 audio_slice = y[start_sample:end_sample]
-                
-                harmonic_cqt = compute_harmonic_cqt(audio_slice, sr=self.sr)
-                
-                # Save Data
-                # ID format: songname_index
-                file_id = f"{item_name}_{i}"
-                
-                np.save(os.path.join(self.output_dir, "specs", f"{file_id}.npy"), harmonic_cqt)
-                
-                # Label: [String (1-6), Fret (0-24)]
+
                 label = np.array([event["string"], event["fret"]])
-                np.save(os.path.join(self.output_dir, "labels", f"{file_id}.npy"), label)
+
+                # --- Original sample ---
+                file_id = f"{item_name}_{i}"
+                harmonic_cqt = compute_harmonic_cqt(audio_slice, sr=self.sr)
+                np.save(os.path.join(spec_dir, f"{file_id}.npy"), harmonic_cqt)
+                np.save(os.path.join(label_dir, f"{file_id}.npy"), label)
+
+                # --- Augmented samples (pedalboard) ---
+                if self.augment:
+                    aug_slices = augment_audio(audio_slice, sr=self.sr, n_augmentations=self.n_augmentations)
+                    for aug_idx, aug_slice in enumerate(aug_slices):
+                        aug_id = f"{item_name}_{i}_aug{aug_idx}"
+                        aug_hcqt = compute_harmonic_cqt(aug_slice, sr=self.sr)
+                        np.save(os.path.join(spec_dir, f"{aug_id}.npy"), aug_hcqt)
+                        np.save(os.path.join(label_dir, f"{aug_id}.npy"), label)
         
         
