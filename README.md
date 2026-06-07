@@ -48,8 +48,12 @@ The project was developed as a final-year dissertation on automatic guitar music
 
 ## Demo
 
-> Add a short screen recording or GIF of the transcription workflow here, for example:
-> `![Demo](docs/images/demo.gif)`
+<div align="center">
+
+[![Watch the demo](https://img.youtube.com/vi/PWJ_wfikSX0/hqdefault.jpg)](https://youtu.be/PWJ_wfikSX0)
+
+Watch the demonstration of the project 
+</div>
 
 ## Screenshots
 
@@ -65,7 +69,7 @@ The project was developed as a final-year dissertation on automatic guitar music
 
 The application follows a Model-View-Controller structure separating audio processing, the machine learning models, and the GUI.
 
-![System Architecture](docs/images/system_architecture_mvc.drawio.png)
+![System Architecture](docs/images/system_archtecture_mvc.drawio.png)
 
 ## Transcription Models
 
