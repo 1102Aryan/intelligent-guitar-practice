@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/images/Intelligent_guitar_practice_tool.png" alt="Intelligent Guitar Practice Tool Logo" width="150" />
+
 # Intelligent Guitar Practice Tool
 
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
